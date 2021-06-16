@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "224999897426",
+    "project_id": "time-share-7eb5b",
+    "storage_bucket": "time-share-7eb5b.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:224999897426:android:6e48ada6949d14f2cd228b",
+        "android_client_info": {
+          "package_name": "co.share2care.timeshare"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "224999897426-u1pa8hjb7nikaq0g9l9pl9l0hj15sh44.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "co.share2care.timeshare",
+            "certificate_hash": "071811df1cd919c48460e54cae97ab25b215bcdf"
+          }
+        },
+        {
+          "client_id": "224999897426-jp7jbg425csh4u0vegmj0kd1a7o19v19.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBD-N9PtShuUpuZEabDHMLtLYVlsWzea_8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "224999897426-jp7jbg425csh4u0vegmj0kd1a7o19v19.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
