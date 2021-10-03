@@ -1,10 +1,54 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'dart:convert';
+import 'dart:async';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:timeshare/constants.dart';
 import 'package:timeshare/drawer/drawer.dart';
+import 'package:timeshare/homepage.dart';
 
-class ContactUs extends StatelessWidget {
+class ContactUs extends StatefulWidget {
+  @override
+  _ContactUsState createState() => _ContactUsState();
+}
+
+class _ContactUsState extends State<ContactUs> {
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
+  TextEditingController _controller1 = TextEditingController();
+  TextEditingController _controller2 = TextEditingController();
+  TextEditingController _controller3 = TextEditingController();
+  String name, email, message;
+
+   @override
+  void initState() {
+    getUserDetails();
+    super.initState();
+  }
+
+  snackBar(String message) {
+    return ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        duration: Duration(seconds: 1),
+      ),
+    );
+  }
+  getUserDetails() async {
+    final prefs = await SharedPreferences.getInstance();
+    final userDetailsString = prefs.getString('userDetailsLocal') ?? '';
+    if (userDetailsString != null) {
+      Map userSavedDetails = json.decode(userDetailsString);
+       setState(() {
+        name=userSavedDetails['firstName']+' '+userSavedDetails['lastName'];
+        email=userSavedDetails['email'];
+      });
+    } else {
+      snackBar('Something went wrong. Please sign in again!!');
+      Navigator.pop(context);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -25,17 +69,9 @@ class ContactUs extends StatelessWidget {
                     SizedBox(height: height * 0.05),
                     Text('CONTACT US', style: kHeading2Style),
                     SizedBox(height: height * 0.03),
-                    Text('E-mail : ',
-                        style: kHeading4Style.copyWith(
-                            fontWeight: FontWeight.w400)),
-                    Text('share2care@gmail.com', style: kHeading4Style),
                     SizedBox(
                       height: height * 0.01,
                     ),
-                    Text('Contact : ',
-                        style: kHeading4Style.copyWith(
-                            fontWeight: FontWeight.w400)),
-                    Text('9999999999', style: kHeading5Style),
                     SizedBox(height: height * 0.03),
                     Text(
                       'Name',
@@ -50,10 +86,15 @@ class ContactUs extends StatelessWidget {
                           padding:
                               EdgeInsets.symmetric(horizontal: height * 0.01),
                           child: TextField(
-                            keyboardType: TextInputType.datetime,
+                            enabled: name==null,
+                            controller: _controller1,
+                            keyboardType: TextInputType.text,
                             decoration: InputDecoration(
                                 border: InputBorder.none,
-                                hintText: 'Enter your name'),
+                                hintText: name),
+                            onChanged: (value) {
+                              name = value;
+                            },
                           ),
                         ),
                       ),
@@ -72,17 +113,22 @@ class ContactUs extends StatelessWidget {
                           padding:
                               EdgeInsets.symmetric(horizontal: height * 0.01),
                           child: TextField(
-                            keyboardType: TextInputType.datetime,
+                            enabled: email==null,
+                            controller: _controller2,
+                            keyboardType: TextInputType.emailAddress,
                             decoration: InputDecoration(
                                 border: InputBorder.none,
-                                hintText: 'Enter your email'),
+                                hintText: email),
+                            onChanged: (value) {
+                              email = value;
+                            },
                           ),
                         ),
                       ),
                     ),
                     SizedBox(height: height * 0.015),
                     Text(
-                      'Meaasge',
+                      'Message',
                       style: kHeading4Style,
                     ),
                     Card(
@@ -94,23 +140,52 @@ class ContactUs extends StatelessWidget {
                           padding:
                               EdgeInsets.symmetric(horizontal: height * 0.01),
                           child: TextField(
+                            controller: _controller3,
                             keyboardType: TextInputType.multiline,
                             minLines: 5,
                             maxLines: 7,
                             decoration: InputDecoration(
                                 border: InputBorder.none, hintText: 'Message'),
+                            onChanged: (value) {
+                              message = value;
+                            },
                           ),
                         ),
                       ),
                     ),
-                    SizedBox(height: height*0.02,),
+                    SizedBox(
+                      height: height * 0.02,
+                    ),
                     Center(
                       child: Container(
                         decoration: inputFieldDecorationWhite,
-                          child: IconButton(
-                              onPressed: () {},
-                              icon: FaIcon(FontAwesomeIcons.paperPlane,
-                                  color: blue3))),
+                        child: TextButton(
+                          child: Container(
+                            height: height * 0.035,
+                            width: width * 0.9,
+                            child: Center(
+                              child: Text(
+                                "SEND",
+                                style: kButtonText,
+                              ),
+                            ),
+                          ),
+                          onPressed: () {
+                            sendMessage();
+                          },
+                          style: ButtonStyle(
+                            foregroundColor:
+                                MaterialStateProperty.all<Color>(Colors.white),
+                            backgroundColor:
+                                MaterialStateProperty.all<Color>(Colors.black),
+                            shape: MaterialStateProperty.all(
+                              RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(30.0),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
                     )
                   ],
                 )),
@@ -132,5 +207,29 @@ class ContactUs extends StatelessWidget {
                 )),
           ],
         ));
+  }
+
+  sendMessage() async {
+    final dbRef = FirebaseFirestore.instance.collection('/messages');
+    if (validate()) {
+      await dbRef.add(
+          {'name': name, 'email': email, 'message': message}).catchError((e) {
+        snackBar('Something went Wrong!! Please try again Later');
+      });
+      _controller1.clear();
+      _controller2.clear();
+      _controller3.clear();
+      snackBar('Message sent!!');
+      Navigator.push(context, MaterialPageRoute(builder: (context)=>HomePage(currentTab: 0)));
+    }
+  }
+
+  bool validate() {
+    if (email != null && name != null && message != null) {
+      return true;
+    } else {
+      snackBar('Enter Details Correctly');
+      return false;
+    }
   }
 }

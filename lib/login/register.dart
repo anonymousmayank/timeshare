@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:date_time_picker/date_time_picker.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -15,49 +16,45 @@ class RegisterPage extends StatefulWidget {
 }
 
 class _RegisterPageState extends State<RegisterPage> {
-  File _image;
+  File profilePic;
   final picker = ImagePicker();
-  final _auth=FirebaseAuth.instance;
-  Map user={
-    'firstName':'',
-    'lastName':'',
-    'profilePic':'',
-    'email':'',
-    'mobile':[],
-    'gender':'',
-    'dob':'',
-    'bloodGrp':'',
-    'disease':'',
-    'adhaar':'',
-    'address':'',
-    'locality':'',
-    'city':'',
-    'state':'',
-    'pinCode':'',
-    'highestQualification':'',
-    'professionalCareer':'',
-    'hobbies':'',
-    'emergencyContact':'',
-    'emergencyName':'',
-    'emergencyRelationship':'',
-    'skillSet':[],
-    'kyc':{
-      'adhaar':'',
-      'voterId':'',
-      'drivingLicense':'',
-      'passport':''
-    },
-    'myMeetings':[],
-    'joinedMeetings':[],
-    'notificatins':[]
+  // final _auth = FirebaseAuth.instance;
+  Map user = {
+    'firstName': '',
+    'lastName': '',
+    'profilePic': '',
+    'email': '',
+    'mobile': [],
+    'gender': '',
+    'dob': '',
+    'bloodGrp': '',
+    'disease': '',
+    'adhaar': '',
+    'address': '',
+    'locality': '',
+    'city': '',
+    'state': '',
+    'pinCode': '',
+    'highestQualification': '',
+    'professionalCareer': '',
+    'hobbies': '',
+    'emergencyContact': '',
+    'emergencyName': '',
+    'emergencyRelation': '',
+    'skillSet': [],
+    'kyc': {'adhaar': '', 'voterId': '', 'drivingLicense': '', 'passport': ''},
+    'myMeetings': [],
+    'joinedMeetings': [],
+    'notifications': [],
+    'accValidated':false
   };
   String firstName,
       lastName,
       email,
-      secmobile,
+      secmobile=' ',
       primarymobile,
-      bloodGroup,
-      disease,
+      bloodGroup='Select',
+      disease='Select',
       adhaar,
       address,
       locality,
@@ -65,57 +62,52 @@ class _RegisterPageState extends State<RegisterPage> {
       state,
       pincode,
       dob,
-      gender,
-      highestQualification,
+      gender='Select',
+      highestQualification='Select',
       professionalCareer,
       hobbies,
       emergencyContact,
       emergencyName,
-      emergencyRelationship;
+      emergencyRelationship='Select';
   List<String> qualifications = [
     'Select',
-    'Graduate',
+    'Doctorate',
     'Post-Graduate',
-    'High School'
+    'Graduate',
+    'Non-Graduate'
   ];
-  String uid;
+  // String uid;
   List<String> skillSet = ['Skill 1', 'Skill 2', 'Skill 3'];
 
   initState() {
-  super.initState();
-  getUserId();
-}
-
-  getUserId(){
-    final User user= _auth.currentUser;
-    uid=user.uid;
-    if(uid!=null){
-      primarymobile=user.phoneNumber;
-      print(uid);
-    }
-    else{
-      snackBar('Something went wrong. Please sign in again!!');
-      Navigator.pop(context);
-    }
+    super.initState();
+    getUserId();
   }
+
   Future getImageGallery() async {
     final pickedFile = await picker.getImage(source: ImageSource.gallery);
 
     setState(() {
       if (pickedFile != null) {
-        _image = File(pickedFile.path);
+        profilePic = File(pickedFile.path);
       }
     });
+    uploadFile();
+    Navigator.pop(context);
   }
+
   Future getImageCamera() async {
-    final pickedFile = await picker.getImage(source: ImageSource.camera);
+    final pickedFile = await picker.getImage(source: ImageSource.camera,imageQuality: 50);
 
     setState(() {
       if (pickedFile != null) {
-        _image = File(pickedFile.path);
+        profilePic = File(pickedFile.path);
       }
     });
+    uploadFile();
+    Navigator.pop(context);
   }
+
   // snackBar Widget
   snackBar(String message) {
     return ScaffoldMessenger.of(context).showSnackBar(
@@ -125,6 +117,8 @@ class _RegisterPageState extends State<RegisterPage> {
       ),
     );
   }
+
+  
 
   @override
   Widget build(BuildContext context) {
@@ -152,113 +146,157 @@ class _RegisterPageState extends State<RegisterPage> {
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
                             SizedBox(height: height * 0.05),
-                            Text('REGISTER',
-                                style: kHeading2Style),
+                            Text('REGISTER', style: kHeading2Style),
                             SizedBox(
                               height: height * 0.04,
                             ),
                             Padding(
-                              padding:EdgeInsets.symmetric(horizontal:width*0.04),
+                              padding: EdgeInsets.symmetric(
+                                  horizontal: width * 0.04),
                               child: Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   GestureDetector(
-                                    onTap: (){
+                                    onTap: () {
                                       showMaterialModalBottomSheet(
-                      context: context,
-                      builder: (context) => Container(
-                        decoration: linerGradient,
-                        height:height*0.2,
-                          child: Column(
-                            children: [
-                              SizedBox(height:height*0.02),
-                              Text('Choose Image Source',style:kHeading3Style),
-                              SizedBox(height: height*0.05,),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                              TextButton(
-                                child: Container(
-                                  height: height * 0.035,
-                                  width: width * 0.4,
-                                  child: Center(
-                                    child: Text(
-                                      "GALLERY",
-                                      style: kButtonText,
-                                    ),
-                                  ),
-                                ),
-                                onPressed: getImageGallery,
-                                style: ButtonStyle(
-                                  foregroundColor: MaterialStateProperty.all<Color>(
-                                      Colors.white),
-                                  backgroundColor: MaterialStateProperty.all<Color>(
-                                      Colors.black),
-                                  shape: MaterialStateProperty.all(
-                                    RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(30.0),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              SizedBox(width: width*0.02,),
-                              TextButton(
-                                child: Container(
-                                  height: height * 0.035,
-                                  width: width * 0.4,
-                                  child: Center(
-                                    child: Text(
-                                      "CAMERA",
-                                      style: kButtonText,
-                                    ),
-                                  ),
-                                ),
-                                onPressed: getImageCamera,
-                                style: ButtonStyle(
-                                  foregroundColor: MaterialStateProperty.all<Color>(
-                                      blue3),
-                                  backgroundColor: MaterialStateProperty.all<Color>(
-                                      Colors.white),
-                                  shape: MaterialStateProperty.all(
-                                    RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(30.0),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                        ],
-                      ),
-                            ],
-                          )),
-                    );
+                                        context: context,
+                                        builder: (context) => Container(
+                                            decoration: linerGradient,
+                                            height: height * 0.2,
+                                            child: Column(
+                                              children: [
+                                                SizedBox(height: height * 0.02),
+                                                Text('Choose Image Source',
+                                                    style: kHeading3Style),
+                                                SizedBox(
+                                                  height: height * 0.05,
+                                                ),
+                                                Row(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.center,
+                                                  children: [
+                                                    TextButton(
+                                                      child: Container(
+                                                        height: height * 0.035,
+                                                        width: width * 0.4,
+                                                        child: Center(
+                                                          child: Text(
+                                                            "GALLERY",
+                                                            style: kButtonText,
+                                                          ),
+                                                        ),
+                                                      ),
+                                                      onPressed:
+                                                          getImageGallery,
+                                                      style: ButtonStyle(
+                                                        foregroundColor:
+                                                            MaterialStateProperty
+                                                                .all<Color>(
+                                                                    Colors
+                                                                        .white),
+                                                        backgroundColor:
+                                                            MaterialStateProperty
+                                                                .all<Color>(
+                                                                    Colors
+                                                                        .black),
+                                                        shape:
+                                                            MaterialStateProperty
+                                                                .all(
+                                                          RoundedRectangleBorder(
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        30.0),
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    ),
+                                                    SizedBox(
+                                                      width: width * 0.02,
+                                                    ),
+                                                    TextButton(
+                                                      child: Container(
+                                                        height: height * 0.035,
+                                                        width: width * 0.4,
+                                                        child: Center(
+                                                          child: Text(
+                                                            "CAMERA",
+                                                            style: kButtonText,
+                                                          ),
+                                                        ),
+                                                      ),
+                                                      onPressed: getImageCamera,
+                                                      style: ButtonStyle(
+                                                        foregroundColor:
+                                                            MaterialStateProperty
+                                                                .all<Color>(
+                                                                    blue3),
+                                                        backgroundColor:
+                                                            MaterialStateProperty
+                                                                .all<Color>(
+                                                                    Colors
+                                                                        .white),
+                                                        shape:
+                                                            MaterialStateProperty
+                                                                .all(
+                                                          RoundedRectangleBorder(
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        30.0),
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ],
+                                            )),
+                                      );
                                     },
                                     child: Container(
                                         decoration: inputFieldDecoration,
-                                        height: height * 0.05,
                                         width: width * 0.6,
-                                        child: Row(
-                                          children: [
-                                            SizedBox(
-                                              width: height * 0.015,
-                                            ),
-                                            FaIcon(FontAwesomeIcons.camera,
-                                                size: height * 0.02,
-                                                color: Colors.black),
-                                            SizedBox(
-                                              width: height * 0.01,
-                                            ),
-                                            Text('Update Profile Pic',
-                                                style: TextStyle(
-                                                    fontSize: height * 0.022,
-                                                    fontWeight: FontWeight.w500)),
-                                          ],
+                                        child: Padding(
+                                          padding: EdgeInsets.symmetric(vertical:height*0.015),
+                                          child: Row(
+                                            children: [
+                                              SizedBox(
+                                                width: height * 0.015,
+                                              ),
+                                              FaIcon(FontAwesomeIcons.camera,
+                                                  size: height * 0.02,
+                                                  color: Colors.black),
+                                              SizedBox(
+                                                width: height * 0.01,
+                                              ),
+                                              Text('Update Profile Pic',
+                                                  style: TextStyle(
+                                                      fontSize: height * 0.022,
+                                                      fontWeight:
+                                                          FontWeight.w500)),
+                                            ],
+                                          ),
                                         )),
                                   ),
                                   Spacer(),
-                                  CircleAvatar(
-                                    backgroundImage:
-                                        AssetImage('assets/profile.jfif'),
-                                    radius: height * 0.05,
+                                  
+                                  Container(
+                                    height: height * 0.1,
+                                    width: height * 0.1,
+                                    child:Card(
+                                    semanticContainer: true,
+                                    clipBehavior: Clip.antiAliasWithSaveLayer,
+                                    child: (profilePic != null)
+                                        ? Image.file(profilePic,
+                                            fit: BoxFit.cover)
+                                        : Image.asset('assets/profile.jfif',
+                                            fit: BoxFit.cover),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(height),
+                                    ),
+                                    elevation: 5,
+                                  ),
                                   ),
                                 ],
                               ),
@@ -266,13 +304,15 @@ class _RegisterPageState extends State<RegisterPage> {
                             SizedBox(
                               height: height * 0.01,
                             ),
-
                             Card(
                               child: Column(
                                 children: [
                                   SizedBox(height: height * 0.01),
-                                  Text('Personal Details',style:kHeading4Style),
-                                  SizedBox(height: height*0.01,),
+                                  Text('Personal Details',
+                                      style: kHeading3Style),
+                                  SizedBox(
+                                    height: height * 0.01,
+                                  ),
                                   Row(
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
@@ -288,15 +328,18 @@ class _RegisterPageState extends State<RegisterPage> {
                                                   style: kInputLabelStyle),
                                             ),
                                             Container(
-                                                decoration: inputFieldDecoration,
-                                                height: height * 0.05,
+                                                decoration:
+                                                    inputFieldDecoration,
+                                                // height: height * 0.05,
                                                 width: width * 0.425,
                                                 child: Row(
                                                   children: [
                                                     SizedBox(
                                                       width: height * 0.015,
                                                     ),
-                                                    FaIcon(FontAwesomeIcons.userAlt,
+                                                    FaIcon(
+                                                        FontAwesomeIcons
+                                                            .userAlt,
                                                         size: height * 0.02,
                                                         color: Colors.white),
                                                     SizedBox(
@@ -306,10 +349,13 @@ class _RegisterPageState extends State<RegisterPage> {
                                                       child: TextField(
                                                         keyboardType:
                                                             TextInputType.text,
-                                                        decoration: InputDecoration(
-                                                            border: InputBorder.none,
-                                                            hintText:
-                                                                'Enter Name'),
+                                                        decoration:
+                                                            InputDecoration(
+                                                                border:
+                                                                    InputBorder
+                                                                        .none,
+                                                                hintText:
+                                                                    'Enter Name'),
                                                         onChanged: (input) {
                                                           firstName = input;
                                                         },
@@ -327,19 +373,22 @@ class _RegisterPageState extends State<RegisterPage> {
                                               padding: EdgeInsets.symmetric(
                                                   horizontal: height * 0.015,
                                                   vertical: height * 0.001),
-                                              child: Text('Sur-Name',
+                                              child: Text('Surname',
                                                   style: kInputLabelStyle),
                                             ),
                                             Container(
-                                                decoration: inputFieldDecoration,
-                                                height: height * 0.05,
+                                                decoration:
+                                                    inputFieldDecoration,
+                                                // height: height * 0.05,
                                                 width: width * 0.425,
                                                 child: Row(
                                                   children: [
                                                     SizedBox(
                                                       width: height * 0.015,
                                                     ),
-                                                    FaIcon(FontAwesomeIcons.userAlt,
+                                                    FaIcon(
+                                                        FontAwesomeIcons
+                                                            .userAlt,
                                                         size: height * 0.02,
                                                         color: Colors.white),
                                                     SizedBox(
@@ -350,9 +399,10 @@ class _RegisterPageState extends State<RegisterPage> {
                                                         keyboardType:
                                                             TextInputType.text,
                                                         decoration: InputDecoration(
-                                                            border: InputBorder.none,
+                                                            border: InputBorder
+                                                                .none,
                                                             hintText:
-                                                                'Enter SurName'),
+                                                                'Enter Surname'),
                                                         onChanged: (input) {
                                                           lastName = input;
                                                         },
@@ -363,350 +413,421 @@ class _RegisterPageState extends State<RegisterPage> {
                                           ]),
                                     ],
                                   ),
-                                
-                            SizedBox(
-                              height: height * 0.01,
-                            ),
-                            Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Padding(
-                                    padding: EdgeInsets.symmetric(
-                                        horizontal: height * 0.015,
-                                        vertical: height * 0.001),
-                                    child: Text('E-mail',
-                                        style: kInputLabelStyle),
+                                  SizedBox(
+                                    height: height * 0.01,
                                   ),
-                                  Container(
-                                      decoration: inputFieldDecoration,
-                                      height: height * 0.05,
-                                      width: width * 0.9,
-                                      child: Row(
-                                        children: [
-                                          SizedBox(
-                                            width: height * 0.015,
-                                          ),
-                                          FaIcon(FontAwesomeIcons.solidEnvelope,
-                                              size: height * 0.02,
-                                              color: Colors.white),
-                                          SizedBox(
-                                            width: height * 0.01,
-                                          ),
-                                          Expanded(
-                                            child: TextField(
-                                              keyboardType:
-                                                  TextInputType.emailAddress,
-                                              decoration: InputDecoration(
-                                                  border: InputBorder.none,
-                                                  hintText: 'Enter E-mail Id'),
-                                              onChanged: (input) {
-                                                email = input;
-                                              },
-                                            ),
-                                          ),
-                                        ],
-                                      ))
-                                ]),
-                            SizedBox(height: height * 0.01),
-                            Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Padding(
-                                    padding: EdgeInsets.symmetric(
-                                        horizontal: height * 0.015,
-                                        vertical: height * 0.001),
-                                    child: Text('Secondry Mobile Number (Optional)',
-                                        style: kInputLabelStyle),
-                                  ),
-                                  Container(
-                                      decoration: inputFieldDecoration,
-                                      height: height * 0.05,
-                                      width: width * 0.9,
-                                      child: Row(
-                                        children: [
-                                          SizedBox(
-                                            width: height * 0.015,
-                                          ),
-                                          FaIcon(FontAwesomeIcons.phoneAlt,
-                                              size: height * 0.02,
-                                              color: Colors.white),
-                                          SizedBox(
-                                            width: height * 0.01,
-                                          ),
-                                          Expanded(
-                                            child: TextField(
-                                              keyboardType:
-                                                  TextInputType.number,
-                                              decoration: InputDecoration(
-                                                  border: InputBorder.none,
-                                                  hintText: 'Enter secondry mobile number'),
-                                              onChanged: (input) {
-                                                secmobile = input;
-                                              },
-                                            ),
-                                          ),
-                                        ],
-                                      ))
-                                ]),
-                            SizedBox(height: height * 0.01),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Padding(
-                                        padding: EdgeInsets.symmetric(
-                                            horizontal: height * 0.015,
-                                            vertical: height * 0.001),
-                                        child: Text('Gender',
-                                            style: kInputLabelStyle),
-                                      ),
-                                      Container(
-                                          decoration: inputFieldDecoration,
-                                          height: height * 0.05,
-                                          width: width * 0.425,
-                                          child: Row(
-                                            children: [
-                                              SizedBox(
-                                                width: height * 0.015,
-                                              ),
-                                              FaIcon(
-                                                  FontAwesomeIcons.transgender,
-                                                  size: height * 0.02,
-                                                  color: Colors.white),
-                                              SizedBox(
-                                                width: height * 0.01,
-                                              ),
-                                              Expanded(
-                                                child:
-                                                    DropdownButtonHideUnderline(
-                                                  child: DropdownButton<String>(
-                                                    hint: Text('Select'),
-                                                    isExpanded: true,
-                                                    items: ['Male', 'Female']
-                                                        .map((String value) {
-                                                      return new DropdownMenuItem<
-                                                          String>(
-                                                        value: value,
-                                                        child: Text(value),
-                                                      );
-                                                    }).toList(),
+                                  Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Padding(
+                                          padding: EdgeInsets.symmetric(
+                                              horizontal: height * 0.015,
+                                              vertical: height * 0.001),
+                                          child: Text('E-mail',
+                                              style: kInputLabelStyle),
+                                        ),
+                                        Container(
+                                            decoration: inputFieldDecoration,
+                                            // height: height * 0.05,
+                                            width: width * 0.9,
+                                            child: Row(
+                                              children: [
+                                                SizedBox(
+                                                  width: height * 0.015,
+                                                ),
+                                                FaIcon(
+                                                    FontAwesomeIcons
+                                                        .solidEnvelope,
+                                                    size: height * 0.02,
+                                                    color: Colors.white),
+                                                SizedBox(
+                                                  width: height * 0.01,
+                                                ),
+                                                Expanded(
+                                                  child: TextField(
+                                                    keyboardType: TextInputType
+                                                        .emailAddress,
+                                                    decoration: InputDecoration(
+                                                        border:
+                                                            InputBorder.none,
+                                                        hintText:
+                                                            'Enter E-mail Id'),
                                                     onChanged: (input) {
-                                                      gender = input;
+                                                      email = input;
                                                     },
                                                   ),
                                                 ),
+                                              ],
+                                            ))
+                                      ]),
+                                  SizedBox(height: height * 0.01),
+                                  Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Padding(
+                                          padding: EdgeInsets.symmetric(
+                                              horizontal: height * 0.015,
+                                              vertical: height * 0.001
                                               ),
-                                            ],
-                                          ))
-                                    ]),
-                                SizedBox(width: width * 0.05),
-                                Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Padding(
-                                        padding: EdgeInsets.symmetric(
-                                            horizontal: height * 0.015,
-                                            vertical: height * 0.001),
-                                        child: Text('Date of Birth',
-                                            style: kInputLabelStyle),
-                                      ),
-                                      Container(
-                                          decoration: inputFieldDecoration,
-                                          height: height * 0.05,
-                                          width: width * 0.425,
-                                          child: Container(
-                                            decoration:
-                                                inputFieldDecoration,
-                                            width: width * 0.42,
-                                            child: SizedBox(
-                                              height: height * 0.05,
-                                              child: DateTimePicker(
-                                                decoration: InputDecoration(
-                                                  icon: Padding(
-                                                    padding: EdgeInsets.only(left:width*0.032),
-                                                    child: FaIcon(FontAwesomeIcons.calendarAlt,color: Colors.white,),
+                                          child: Text(
+                                              'Secondry Mobile Number (Optional)',
+                                              style: kInputLabelStyle),
+                                        ),
+                                        Container(
+                                            decoration: inputFieldDecoration,
+                                            // height: height * 0.05,
+                                            width: width * 0.9,
+                                            child: Row(
+                                              children: [
+                                                SizedBox(
+                                                  width: height * 0.015,
+                                                ),
+                                                FaIcon(
+                                                    FontAwesomeIcons.phoneAlt,
+                                                    size: height * 0.02,
+                                                    color: Colors.white),
+                                                SizedBox(
+                                                  width: height * 0.01,
+                                                ),
+                                                Expanded(
+                                                  child: TextField(
+                                                    keyboardType:
+                                                        TextInputType.number,
+                                                    decoration: InputDecoration(
+                                                        border:
+                                                            InputBorder.none,
+                                                        hintText:
+                                                            'Enter secondry mobile number'),
+                                                    onChanged: (input) {
+                                                      secmobile = input;
+                                                    },
                                                   ),
-                                                    border: InputBorder.none,
-                                                    focusedBorder:
-                                                        InputBorder.none,
-                                                    enabledBorder:
-                                                        InputBorder.none,
-                                                    errorBorder:
-                                                        InputBorder.none,
-                                                    disabledBorder:
-                                                        InputBorder.none,
-                                                    hintText: "dd/mm/yyyy"),
-                                                initialValue: '',
-                                                firstDate: DateTime(2000),
-                                                lastDate: DateTime(2100),
-                                                onChanged: (val) {
-                                                  dob=val;
-                                                },
-                                                validator: (val) {
-                                                  print(val);
-                                                  return null;
-                                                },
-                                                onSaved: (val) => print(val),
-                                              ),
+                                                ),
+                                              ],
+                                            ))
+                                      ]),
+                                  SizedBox(height: height * 0.01),
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Padding(
+                                              padding: EdgeInsets.symmetric(
+                                                  horizontal: height * 0.015,
+                                                  vertical: height * 0.001),
+                                              child: Text('Gender',
+                                                  style: kInputLabelStyle),
                                             ),
-                                          ))
-                                    ]),
-                              ],
-                            ),
-                            SizedBox(height: height * 0.01),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Padding(
-                                        padding: EdgeInsets.symmetric(
-                                            horizontal: height * 0.015,
-                                            vertical: height * 0.001),
-                                        child: Text('Blood Group',
-                                            style: kInputLabelStyle),
-                                      ),
-                                      Container(
-                                          decoration: inputFieldDecoration,
-                                          height: height * 0.05,
-                                          width: width * 0.425,
-                                          child: Row(
-                                            children: [
-                                              SizedBox(
-                                                width: height * 0.015,
-                                              ),
-                                              FaIcon(
-                                                  FontAwesomeIcons.tint,
-                                                  size: height * 0.02,
-                                                  color: Colors.white),
-                                              SizedBox(
-                                                width: height * 0.01,
-                                              ),
-                                              Expanded(
-                                                child:
-                                                    DropdownButtonHideUnderline(
-                                                  child: DropdownButton<String>(
-                                                    hint: Text('Select'),
-                                                    isExpanded: true,
-                                                    items: ['A Positive (A+)','A Negative (A-)','B Positive (B+)','B Negative (B-)','O Positive (O+)','O Negative (O-)','AB Positive (AB+)','AB Negative (AB-)']
-                                                        .map((String value) {
-                                                      return new DropdownMenuItem<
-                                                          String>(
-                                                        value: value,
-                                                        child: Text(value),
-                                                      );
-                                                    }).toList(),
-                                                    onChanged: (input) {
-                                                      bloodGroup = input;
-                                                    },
+                                            Container(
+                                                decoration:
+                                                    inputFieldDecoration,
+                                                // height: height * 0.05,
+                                                width: width * 0.425,
+                                                child: Row(
+                                                  children: [
+                                                    SizedBox(
+                                                      width: height * 0.015,
+                                                    ),
+                                                    FaIcon(
+                                                        FontAwesomeIcons
+                                                            .transgender,
+                                                        size: height * 0.02,
+                                                        color: Colors.white),
+                                                    SizedBox(
+                                                      width: height * 0.01,
+                                                    ),
+                                                    Expanded(
+                                                      child:
+                                                          DropdownButtonHideUnderline(
+                                                        child: DropdownButton<
+                                                            String>(
+                                                          hint: Text(gender),
+                                                          isExpanded: true,
+                                                          items: [
+                                                            'Male',
+                                                            'Female'
+                                                          ].map((String value) {
+                                                            return new DropdownMenuItem<
+                                                                String>(
+                                                              value: value,
+                                                              child:
+                                                                  Text(value),
+                                                            );
+                                                          }).toList(),
+                                                          onChanged: (input) {
+                                                            setState(() {
+                                                              gender = input;
+                                                            });
+                                                            
+                                                          },
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ))
+                                          ]),
+                                      SizedBox(width: width * 0.05),
+                                      Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Padding(
+                                              padding: EdgeInsets.symmetric(
+                                                  horizontal: height * 0.015,
+                                                  vertical: height * 0.001),
+                                              child: Text('Date of Birth',
+                                                  style: kInputLabelStyle),
+                                            ),
+                                            Container(
+                                                decoration:
+                                                    inputFieldDecoration,
+                                                // height: height * 0.05,
+                                                width: width * 0.425,
+                                                child: Container(
+                                                  decoration:
+                                                      inputFieldDecoration,
+                                                  width: width * 0.42,
+                                                  child: SizedBox(
+                                                    height: height * 0.05,
+                                                    child: DateTimePicker(
+                                                      decoration:
+                                                          InputDecoration(
+                                                              icon: Padding(
+                                                                padding: EdgeInsets.only(
+                                                                    left: width *
+                                                                        0.032),
+                                                                child: FaIcon(
+                                                                  FontAwesomeIcons
+                                                                      .calendarAlt,
+                                                                  color: Colors
+                                                                      .white,
+                                                                ),
+                                                              ),
+                                                              border:
+                                                                  InputBorder
+                                                                      .none,
+                                                              focusedBorder:
+                                                                  InputBorder
+                                                                      .none,
+                                                              enabledBorder:
+                                                                  InputBorder
+                                                                      .none,
+                                                              errorBorder:
+                                                                  InputBorder
+                                                                      .none,
+                                                              disabledBorder:
+                                                                  InputBorder
+                                                                      .none,
+                                                              hintText:
+                                                                  "dd/mm/yyyy"),
+                                                      initialValue: '',
+                                                      firstDate: DateTime(1950),
+                                                      lastDate: DateTime(2100),
+                                                      onChanged: (val) {
+                                                        dob = val;
+                                                      },
+                                                      validator: (val) {
+                                                        print(val);
+                                                        return null;
+                                                      },
+                                                      onSaved: (val) =>
+                                                          print(val),
+                                                    ),
                                                   ),
-                                                ),
-                                              ),
-                                            ],
-                                          ))
-                                    ]),
-                                SizedBox(width: width * 0.05),
-                                Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Padding(
-                                        padding: EdgeInsets.symmetric(
-                                            horizontal: height * 0.015,
-                                            vertical: height * 0.001),
-                                        child: Text('Chronic Disease',
-                                            style: kInputLabelStyle),
-                                      ),
-                                      Container(
-                                          decoration: inputFieldDecoration,
-                                          height: height * 0.05,
-                                          width: width * 0.425,
-                                          child: Row(
-                                            children: [
-                                              SizedBox(
-                                                width: height * 0.015,
-                                              ),
-                                              FaIcon(
-                                                  FontAwesomeIcons.disease,
-                                                  size: height * 0.02,
-                                                  color: Colors.white),
-                                              SizedBox(
-                                                width: height * 0.01,
-                                              ),
-                                              Expanded(
-                                                child:
-                                                    DropdownButtonHideUnderline(
-                                                  child: DropdownButton<String>(
-                                                    hint: Text('Select'),
-                                                    isExpanded: true,
-                                                    items: ['Asthama','Blood Pressure','Cancer','Cholestrol','Diabetes','Heart Diseases','PCOD']
-                                                        .map((String value) {
-                                                      return new DropdownMenuItem<
-                                                          String>(
-                                                        value: value,
-                                                        child: Text(value),
-                                                      );
-                                                    }).toList(),
-                                                    onChanged: (input) {
-                                                      disease = input;
-                                                    },
-                                                  ),
-                                                ),
-                                              ),
-                                            ],
-                                          ))
-                                    ]),
-                              ],
-                            ),
-                            SizedBox(height: height * 0.01),
-                            Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Padding(
-                                    padding: EdgeInsets.symmetric(
-                                        horizontal: height * 0.015,
-                                        vertical: height * 0.001),
-                                    child: Text('Adhaar Card Number',
-                                        style: kInputLabelStyle),
+                                                ))
+                                          ]),
+                                    ],
                                   ),
-                                  Container(
-                                      decoration: inputFieldDecoration,
-                                      height: height * 0.05,
-                                      width: width * 0.9,
-                                      child: Row(
-                                        children: [
-                                          SizedBox(
-                                            width: height * 0.015,
-                                          ),
-                                          FaIcon(
-                                              FontAwesomeIcons.solidAddressCard,
-                                              size: height * 0.02,
-                                              color: Colors.white),
-                                          SizedBox(
-                                            width: height * 0.01,
-                                          ),
-                                          Expanded(
-                                            child: TextField(
-                                              keyboardType:
-                                                  TextInputType.number,
-                                              decoration: InputDecoration(
-                                                  border: InputBorder.none,
-                                                  hintText: 'XXXX-XXXX-XXXX'),
-                                              onChanged: (input) {
-                                                adhaar = input;
-                                              },
+                                  SizedBox(height: height * 0.01),
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Padding(
+                                              padding: EdgeInsets.symmetric(
+                                                  horizontal: height * 0.015,
+                                                  vertical: height * 0.001),
+                                              child: Text('Blood Group',
+                                                  style: kInputLabelStyle),
                                             ),
-                                          ),
-                                        ],
-                                      )),
-                                      SizedBox(height: height * 0.01),
-                                ]),
+                                            Container(
+                                                decoration:
+                                                    inputFieldDecoration,
+                                                // height: height * 0.05,
+                                                width: width * 0.425,
+                                                child: Row(
+                                                  children: [
+                                                    SizedBox(
+                                                      width: height * 0.015,
+                                                    ),
+                                                    FaIcon(
+                                                        FontAwesomeIcons.tint,
+                                                        size: height * 0.02,
+                                                        color: Colors.white),
+                                                    SizedBox(
+                                                      width: height * 0.01,
+                                                    ),
+                                                    Expanded(
+                                                      child:
+                                                          DropdownButtonHideUnderline(
+                                                        child: DropdownButton<
+                                                            String>(
+                                                          hint: Text(bloodGroup),
+                                                          isExpanded: true,
+                                                          items: [
+                                                            'A+',
+                                                            'A-',
+                                                            'B+',
+                                                            'B-',
+                                                            'O+',
+                                                            'O-',
+                                                            'AB+',
+                                                            'AB-'
+                                                          ].map((String value) {
+                                                            return new DropdownMenuItem<
+                                                                String>(
+                                                              value: value,
+                                                              child:
+                                                                  Text(value),
+                                                            );
+                                                          }).toList(),
+                                                          onChanged: (input) {
+                                                            setState(() {
+                                                              bloodGroup = input;
+                                                            });
+                                                            
+                                                          },
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ))
+                                          ]),
+                                      SizedBox(width: width * 0.05),
+                                      Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Padding(
+                                              padding: EdgeInsets.symmetric(
+                                                  horizontal: height * 0.015,
+                                                  vertical: height * 0.001),
+                                              child: Text('Chronic Disease',
+                                                  style: kInputLabelStyle),
+                                            ),
+                                            Container(
+                                                decoration:
+                                                    inputFieldDecoration,
+                                                // height: height * 0.05,
+                                                width: width * 0.425,
+                                                child: Row(
+                                                  children: [
+                                                    SizedBox(
+                                                      width: height * 0.015,
+                                                    ),
+                                                    FaIcon(
+                                                        FontAwesomeIcons
+                                                            .disease,
+                                                        size: height * 0.02,
+                                                        color: Colors.white),
+                                                    SizedBox(
+                                                      width: height * 0.01,
+                                                    ),
+                                                    Expanded(
+                                                      child:
+                                                          DropdownButtonHideUnderline(
+                                                        child: DropdownButton<
+                                                            String>(
+                                                          hint: Text(disease),
+                                                          isExpanded: true,
+                                                          items: [
+                                                            'None',
+                                                            'Asthama',
+                                                            'Blood Pressure',
+                                                            'Cancer',
+                                                            'Cholestrol',
+                                                            'Chronic Obstructive Pulmonary Disease (COPD)'
+                                                            'Diabetes',
+                                                            'Heart Diseases',
+                                                            'PCOD',
+                                                            'TB'
+                                                          ].map((String value) {
+                                                            return new DropdownMenuItem<
+                                                                String>(
+                                                              value: value,
+                                                              child:
+                                                                  Text(value),
+                                                            );
+                                                          }).toList(),
+                                                          onChanged: (input) {
+                                                            setState(() {
+                                                              disease = input;
+                                                            });
+                                                            
+                                                          },
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ))
+                                          ]),
+                                    ],
+                                  ),
+                                  SizedBox(height: height * 0.01),
+                                  Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Padding(
+                                          padding: EdgeInsets.symmetric(
+                                              horizontal: height * 0.015,
+                                              vertical: height * 0.001),
+                                          child: Text('Adhaar Card Number',
+                                              style: kInputLabelStyle),
+                                        ),
+                                        Container(
+                                            decoration: inputFieldDecoration,
+                                            // height: height * 0.05,
+                                            width: width * 0.9,
+                                            child: Row(
+                                              children: [
+                                                SizedBox(
+                                                  width: height * 0.015,
+                                                ),
+                                                FaIcon(
+                                                    FontAwesomeIcons
+                                                        .solidAddressCard,
+                                                    size: height * 0.02,
+                                                    color: Colors.white),
+                                                SizedBox(
+                                                  width: height * 0.01,
+                                                ),
+                                                Expanded(
+                                                  child: TextField(
+                                                    keyboardType:
+                                                        TextInputType.number,
+                                                    decoration: InputDecoration(
+                                                        border:
+                                                            InputBorder.none,
+                                                        hintText:
+                                                            'XXXX-XXXX-XXXX'),
+                                                    onChanged: (input) {
+                                                      adhaar = input;
+                                                    },
+                                                  ),
+                                                ),
+                                              ],
+                                            )),
+                                        SizedBox(height: height * 0.01),
+                                      ]),
                                 ],
                               ),
                               elevation: 1,
@@ -715,29 +836,33 @@ class _RegisterPageState extends State<RegisterPage> {
                             Card(
                               child: Column(
                                 children: [
-                                   SizedBox(height: height * 0.01),
-                                  Text('Address',style:kHeading4Style),
+                                  SizedBox(height: height * 0.01),
+                                  Text('Address', style: kHeading3Style),
                                   SizedBox(height: height * 0.01),
                                   Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
                                       children: [
                                         Padding(
                                           padding: EdgeInsets.symmetric(
                                               horizontal: height * 0.015,
                                               vertical: height * 0.001),
-                                          child: Text('Address - House Number / Street',
+                                          child: Text(
+                                              'Address - House Number / Street',
                                               style: kInputLabelStyle),
                                         ),
                                         Container(
                                             decoration: inputFieldDecoration,
-                                            height: height * 0.05,
+                                            // height: height * 0.05,
                                             width: width * 0.9,
                                             child: Row(
                                               children: [
                                                 SizedBox(
                                                   width: height * 0.015,
                                                 ),
-                                                FaIcon(FontAwesomeIcons.solidBuilding,
+                                                FaIcon(
+                                                    FontAwesomeIcons
+                                                        .solidBuilding,
                                                     size: height * 0.02,
                                                     color: Colors.white),
                                                 SizedBox(
@@ -745,10 +870,13 @@ class _RegisterPageState extends State<RegisterPage> {
                                                 ),
                                                 Expanded(
                                                   child: TextField(
-                                                    keyboardType: TextInputType.text,
+                                                    keyboardType:
+                                                        TextInputType.text,
                                                     decoration: InputDecoration(
-                                                        border: InputBorder.none,
-                                                        hintText: 'Address Line 1'),
+                                                        border:
+                                                            InputBorder.none,
+                                                        hintText:
+                                                            'House Number/ Street'),
                                                     onChanged: (input) {
                                                       address = input;
                                                     },
@@ -757,192 +885,210 @@ class _RegisterPageState extends State<RegisterPage> {
                                               ],
                                             ))
                                       ]),
-                                
-                            SizedBox(height: height * 0.01),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
+                                  SizedBox(height: height * 0.01),
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
-                                      Padding(
-                                        padding: EdgeInsets.symmetric(
-                                            horizontal: height * 0.015,
-                                            vertical: height * 0.001),
-                                        child: Text('Locality',
-                                            style: kInputLabelStyle),
-                                      ),
-                                      Container(
-                                          decoration: inputFieldDecoration,
-                                          height: height * 0.05,
-                                          width: width * 0.425,
-                                          child: Row(
-                                            children: [
-                                              SizedBox(
-                                                width: height * 0.015,
-                                              ),
-                                              FaIcon(
-                                                  FontAwesomeIcons.mapMarkerAlt,
-                                                  size: height * 0.02,
-                                                  color: Colors.white),
-                                              SizedBox(
-                                                width: height * 0.01,
-                                              ),
-                                              Expanded(
-                                                child: TextField(
-                                                  keyboardType:
-                                                      TextInputType.text,
-                                                  decoration: InputDecoration(
-                                                      border: InputBorder.none,
-                                                      hintText:
-                                                          'Enter Locality'),
-                                                  onChanged: (input) {
-                                                    locality = input;
-                                                  },
-                                                ),
-                                              ),
-                                            ],
-                                          ))
-                                    ]),
-                                SizedBox(width: width * 0.05),
-                                Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
+                                      Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Padding(
+                                              padding: EdgeInsets.symmetric(
+                                                  horizontal: height * 0.015,
+                                                  vertical: height * 0.001),
+                                              child: Text('Locality',
+                                                  style: kInputLabelStyle),
+                                            ),
+                                            Container(
+                                                decoration:
+                                                    inputFieldDecoration,
+                                                // height: height * 0.05,
+                                                width: width * 0.425,
+                                                child: Row(
+                                                  children: [
+                                                    SizedBox(
+                                                      width: height * 0.015,
+                                                    ),
+                                                    FaIcon(
+                                                        FontAwesomeIcons
+                                                            .mapMarkerAlt,
+                                                        size: height * 0.02,
+                                                        color: Colors.white),
+                                                    SizedBox(
+                                                      width: height * 0.01,
+                                                    ),
+                                                    Expanded(
+                                                      child: TextField(
+                                                        keyboardType:
+                                                            TextInputType.text,
+                                                        decoration: InputDecoration(
+                                                            border: InputBorder
+                                                                .none,
+                                                            hintText:
+                                                                'Enter Locality'),
+                                                        onChanged: (input) {
+                                                          locality = input;
+                                                        },
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ))
+                                          ]),
+                                      SizedBox(width: width * 0.05),
+                                      Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Padding(
+                                              padding: EdgeInsets.symmetric(
+                                                  horizontal: height * 0.015,
+                                                  vertical: height * 0.001),
+                                              child: Text('District/City',
+                                                  style: kInputLabelStyle),
+                                            ),
+                                            Container(
+                                                decoration:
+                                                    inputFieldDecoration,
+                                                // height: height * 0.05,
+                                                width: width * 0.425,
+                                                child: Row(
+                                                  children: [
+                                                    SizedBox(
+                                                      width: height * 0.015,
+                                                    ),
+                                                    FaIcon(
+                                                        FontAwesomeIcons
+                                                            .mapMarkedAlt,
+                                                        size: height * 0.02,
+                                                        color: Colors.white),
+                                                    SizedBox(
+                                                      width: height * 0.01,
+                                                    ),
+                                                    Expanded(
+                                                      child: TextField(
+                                                        keyboardType:
+                                                            TextInputType.text,
+                                                        decoration:
+                                                            InputDecoration(
+                                                                border:
+                                                                    InputBorder
+                                                                        .none,
+                                                                hintText:
+                                                                    'Enter City'),
+                                                        onChanged: (input) {
+                                                          city = input;
+                                                        },
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ))
+                                          ]),
+                                    ],
+                                  ),
+                                  SizedBox(height: height * 0.01),
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
-                                      Padding(
-                                        padding: EdgeInsets.symmetric(
-                                            horizontal: height * 0.015,
-                                            vertical: height * 0.001),
-                                        child: Text('District/City',
-                                            style:kInputLabelStyle),
-                                      ),
-                                      Container(
-                                          decoration: inputFieldDecoration,
-                                          height: height * 0.05,
-                                          width: width * 0.425,
-                                          child: Row(
-                                            children: [
-                                              SizedBox(
-                                                width: height * 0.015,
-                                              ),
-                                              FaIcon(
-                                                  FontAwesomeIcons.mapMarkedAlt,
-                                                  size: height * 0.02,
-                                                  color: Colors.white),
-                                              SizedBox(
-                                                width: height * 0.01,
-                                              ),
-                                              Expanded(
-                                                child: TextField(
-                                                  keyboardType:
-                                                      TextInputType.text,
-                                                  decoration: InputDecoration(
-                                                      border: InputBorder.none,
-                                                      hintText: 'Enter City'),
-                                                  onChanged: (input) {
-                                                    city = input;
-                                                  },
-                                                ),
-                                              ),
-                                            ],
-                                          ))
-                                    ]),
-                              ],
-                            ),
-                            SizedBox(height: height * 0.01),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Padding(
-                                        padding: EdgeInsets.symmetric(
-                                            horizontal: height * 0.015,
-                                            vertical: height * 0.001),
-                                        child: Text('State',
-                                            style: kInputLabelStyle),
-                                      ),
-                                      Container(
-                                          decoration: inputFieldDecoration,
-                                          height: height * 0.05,
-                                          width: width * 0.425,
-                                          child: Row(
-                                            children: [
-                                              SizedBox(
-                                                width: height * 0.015,
-                                              ),
-                                              FaIcon(
-                                                  FontAwesomeIcons.mapMarkedAlt,
-                                                  size: height * 0.02,
-                                                  color: Colors.white),
-                                              SizedBox(
-                                                width: height * 0.01,
-                                              ),
-                                              Expanded(
-                                                child: TextField(
-                                                  keyboardType:
-                                                      TextInputType.text,
-                                                  decoration: InputDecoration(
-                                                      border: InputBorder.none,
-                                                      hintText: 'Enter State'),
-                                                  onChanged: (input) {
-                                                    state = input;
-                                                  },
-                                                ),
-                                              ),
-                                            ],
-                                          ))
-                                    ]),
-                                SizedBox(width: width * 0.05),
-                                Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Padding(
-                                        padding: EdgeInsets.symmetric(
-                                            horizontal: height * 0.015,
-                                            vertical: height * 0.001),
-                                        child: Text('Pin Code',
-                                            style: kInputLabelStyle),
-                                      ),
-                                      Container(
-                                          decoration: inputFieldDecoration,
-                                          height: height * 0.05,
-                                          width: width * 0.425,
-                                          child: Row(
-                                            children: [
-                                              SizedBox(
-                                                width: height * 0.015,
-                                              ),
-                                              FaIcon(FontAwesomeIcons.mapPin,
-                                                  size: height * 0.02,
-                                                  color: Colors.white),
-                                              SizedBox(
-                                                width: height * 0.01,
-                                              ),
-                                              Expanded(
-                                                child: TextField(
-                                                  keyboardType:
-                                                      TextInputType.number,
-                                                  decoration: InputDecoration(
-                                                      border: InputBorder.none,
-                                                      hintText:
-                                                          'Enter Pincode'),
-                                                  onChanged: (input) {
-                                                    pincode = input;
-                                                  },
-                                                ),
-                                              ),
-                                            ],
-                                          ))
-                                    ]),
-                              ],
-                            ),
-                            SizedBox(height: height * 0.01),
-                            ],
+                                      Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Padding(
+                                              padding: EdgeInsets.symmetric(
+                                                  horizontal: height * 0.015,
+                                                  vertical: height * 0.001),
+                                              child: Text('State',
+                                                  style: kInputLabelStyle),
+                                            ),
+                                            Container(
+                                                decoration:
+                                                    inputFieldDecoration,
+                                                // height: height * 0.05,
+                                                width: width * 0.425,
+                                                child: Row(
+                                                  children: [
+                                                    SizedBox(
+                                                      width: height * 0.015,
+                                                    ),
+                                                    FaIcon(
+                                                        FontAwesomeIcons
+                                                            .mapMarkedAlt,
+                                                        size: height * 0.02,
+                                                        color: Colors.white),
+                                                    SizedBox(
+                                                      width: height * 0.01,
+                                                    ),
+                                                    Expanded(
+                                                      child: TextField(
+                                                        keyboardType:
+                                                            TextInputType.text,
+                                                        decoration:
+                                                            InputDecoration(
+                                                                border:
+                                                                    InputBorder
+                                                                        .none,
+                                                                hintText:
+                                                                    'Enter State'),
+                                                        onChanged: (input) {
+                                                          state = input;
+                                                        },
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ))
+                                          ]),
+                                      SizedBox(width: width * 0.05),
+                                      Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Padding(
+                                              padding: EdgeInsets.symmetric(
+                                                  horizontal: height * 0.015,
+                                                  vertical: height * 0.001),
+                                              child: Text('Pin Code',
+                                                  style: kInputLabelStyle),
+                                            ),
+                                            Container(
+                                                decoration:
+                                                    inputFieldDecoration,
+                                                // height: height * 0.05,
+                                                width: width * 0.425,
+                                                child: Row(
+                                                  children: [
+                                                    SizedBox(
+                                                      width: height * 0.015,
+                                                    ),
+                                                    FaIcon(
+                                                        FontAwesomeIcons.mapPin,
+                                                        size: height * 0.02,
+                                                        color: Colors.white),
+                                                    SizedBox(
+                                                      width: height * 0.01,
+                                                    ),
+                                                    Expanded(
+                                                      child: TextField(
+                                                        keyboardType:
+                                                            TextInputType
+                                                                .number,
+                                                        decoration: InputDecoration(
+                                                            border: InputBorder
+                                                                .none,
+                                                            hintText:
+                                                                'Enter Pincode'),
+                                                        onChanged: (input) {
+                                                          pincode = input;
+                                                        },
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ))
+                                          ]),
+                                    ],
+                                  ),
+                                  SizedBox(height: height * 0.01),
+                                ],
                               ),
                             ),
                             SizedBox(height: height * 0.01),
@@ -952,11 +1098,14 @@ class _RegisterPageState extends State<RegisterPage> {
                                 crossAxisAlignment: CrossAxisAlignment.stretch,
                                 children: [
                                   SizedBox(height: height * 0.01),
-                                  Center(child: Text('Qualifications',style:kHeading4Style)),
+                                  Center(
+                                      child: Text('Qualifications',
+                                          style: kHeading3Style)),
                                   SizedBox(height: height * 0.01),
                                   Center(
                                     child: Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
                                         children: [
                                           Padding(
                                             padding: EdgeInsets.symmetric(
@@ -967,26 +1116,31 @@ class _RegisterPageState extends State<RegisterPage> {
                                           ),
                                           Container(
                                               decoration: inputFieldDecoration,
-                                              height: height * 0.05,
+                                              // height: height * 0.05,
                                               width: width * 0.9,
                                               child: Row(
                                                 children: [
                                                   SizedBox(
                                                     width: height * 0.015,
                                                   ),
-                                                  FaIcon(FontAwesomeIcons.userGraduate,
+                                                  FaIcon(
+                                                      FontAwesomeIcons
+                                                          .userGraduate,
                                                       size: height * 0.02,
                                                       color: Colors.white),
                                                   SizedBox(
                                                     width: height * 0.01,
                                                   ),
                                                   Expanded(
-                                                    child: DropdownButtonHideUnderline(
-                                                      child: DropdownButton<String>(
-                                                        hint: Text(qualifications[0]),
+                                                    child:
+                                                        DropdownButtonHideUnderline(
+                                                      child: DropdownButton<
+                                                          String>(
+                                                        hint: Text(highestQualification),
                                                         isExpanded: true,
                                                         items: qualifications
-                                                            .map((String value) {
+                                                            .map(
+                                                                (String value) {
                                                           return new DropdownMenuItem<
                                                               String>(
                                                             value: value,
@@ -994,7 +1148,10 @@ class _RegisterPageState extends State<RegisterPage> {
                                                           );
                                                         }).toList(),
                                                         onChanged: (input) {
-                                                          highestQualification = input;
+                                                          setState(() {
+                                                            highestQualification =input;
+                                                          });
+                                                          
                                                         },
                                                       ),
                                                     ),
@@ -1003,97 +1160,104 @@ class _RegisterPageState extends State<RegisterPage> {
                                               ))
                                         ]),
                                   ),
-                                
-                            SizedBox(height: height * 0.01),
-                            Center(
-                              child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Padding(
-                                      padding: EdgeInsets.symmetric(
-                                          horizontal: height * 0.015,
-                                          vertical: height * 0.001),
-                                      child: Text('Professional Career (Latest)',
-                                          style: kInputLabelStyle),
-                                    ),
-                                    Container(
-                                        decoration: inputFieldDecoration,
-                                        height: height * 0.05,
-                                        width: width * 0.9,
-                                        child: Row(
-                                          children: [
-                                            SizedBox(
-                                              width: height * 0.015,
-                                            ),
-                                            FaIcon(FontAwesomeIcons.briefcase,
-                                                size: height * 0.02,
-                                                color: Colors.white),
-                                            SizedBox(
-                                              width: height * 0.01,
-                                            ),
-                                            Expanded(
-                                              child: TextField(
-                                                keyboardType:
-                                                    TextInputType.text,
-                                                decoration: InputDecoration(
-                                                    border: InputBorder.none,
-                                                    hintText:
-                                                        'Enter Current or Last profession'),
-                                                onChanged: (input) {
-                                                  professionalCareer = input;
-                                                },
-                                              ),
-                                            ),
-                                          ],
-                                        ))
-                                  ]),
-                            ),
-                            SizedBox(height: height * 0.01),
-                            Center(
-                              child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Padding(
-                                      padding: EdgeInsets.symmetric(
-                                          horizontal: height * 0.015,
-                                          vertical: height * 0.001),
-                                      child: Text(
-                                          'Hobbies (Use , to seperate multiple Hobbies)',
-                                          style: kInputLabelStyle),
-                                    ),
-                                    Container(
-                                        decoration: inputFieldDecoration,
-                                        height: height * 0.05,
-                                        width: width * 0.9,
-                                        child: Row(
-                                          children: [
-                                            SizedBox(
-                                              width: height * 0.015,
-                                            ),
-                                            FaIcon(FontAwesomeIcons.magic,
-                                                size: height * 0.02,
-                                                color: Colors.white),
-                                            SizedBox(
-                                              width: height * 0.01,
-                                            ),
-                                            Expanded(
-                                              child: TextField(
-                                                keyboardType:
-                                                    TextInputType.text,
-                                                decoration: InputDecoration(
-                                                    border: InputBorder.none,
-                                                    hintText:
-                                                        'Enter Hobbies'),
-                                                onChanged: (input) {
-                                                  hobbies = input;
-                                                },
-                                              ),
-                                            ),
-                                          ],
-                                        ))
-                                  ]),
-                            ),
-                                SizedBox(height: height * 0.01),
+                                  SizedBox(height: height * 0.01),
+                                  Center(
+                                    child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Padding(
+                                            padding: EdgeInsets.symmetric(
+                                                horizontal: height * 0.015,
+                                                vertical: height * 0.001),
+                                            child: Text(
+                                                'Professional Career (Latest)',
+                                                style: kInputLabelStyle),
+                                          ),
+                                          Container(
+                                              decoration: inputFieldDecoration,
+                                              // height: height * 0.05,
+                                              width: width * 0.9,
+                                              child: Row(
+                                                children: [
+                                                  SizedBox(
+                                                    width: height * 0.015,
+                                                  ),
+                                                  FaIcon(
+                                                      FontAwesomeIcons
+                                                          .briefcase,
+                                                      size: height * 0.02,
+                                                      color: Colors.white),
+                                                  SizedBox(
+                                                    width: height * 0.01,
+                                                  ),
+                                                  Expanded(
+                                                    child: TextField(
+                                                      keyboardType:
+                                                          TextInputType.text,
+                                                      decoration: InputDecoration(
+                                                          border:
+                                                              InputBorder.none,
+                                                          hintText:
+                                                              'Enter Current or Last profession'),
+                                                      onChanged: (input) {
+                                                        professionalCareer =
+                                                            input;
+                                                      },
+                                                    ),
+                                                  ),
+                                                ],
+                                              ))
+                                        ]),
+                                  ),
+                                  SizedBox(height: height * 0.01),
+                                  Center(
+                                    child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Padding(
+                                            padding: EdgeInsets.symmetric(
+                                                horizontal: height * 0.015,
+                                                vertical: height * 0.001),
+                                            child: Text(
+                                                'Hobbies (Use , to seperate multiple Hobbies)',
+                                                style: kInputLabelStyle),
+                                          ),
+                                          Container(
+                                              decoration: inputFieldDecoration,
+                                              // height: height * 0.05,
+                                              width: width * 0.9,
+                                              child: Row(
+                                                children: [
+                                                  SizedBox(
+                                                    width: height * 0.015,
+                                                  ),
+                                                  FaIcon(FontAwesomeIcons.magic,
+                                                      size: height * 0.02,
+                                                      color: Colors.white),
+                                                  SizedBox(
+                                                    width: height * 0.01,
+                                                  ),
+                                                  Expanded(
+                                                    child: TextField(
+                                                      keyboardType:
+                                                          TextInputType.text,
+                                                      decoration: InputDecoration(
+                                                          border:
+                                                              InputBorder.none,
+                                                          hintText:
+                                                              'Enter Hobbies'),
+                                                      onChanged: (input) {
+                                                        hobbies = input;
+                                                      },
+                                                    ),
+                                                  ),
+                                                ],
+                                              ))
+                                        ]),
+                                  ),
+                                  SizedBox(height: height * 0.01),
                                 ],
                               ),
                             ),
@@ -1101,29 +1265,33 @@ class _RegisterPageState extends State<RegisterPage> {
                             Card(
                               child: Column(
                                 children: [
-                                   SizedBox(height: height * 0.01),
-                                  Text('Emergency Contact',style:kHeading4Style),
+                                  SizedBox(height: height * 0.01),
+                                  Text('Emergency Contact',
+                                      style: kHeading3Style),
                                   SizedBox(height: height * 0.01),
                                   Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
                                       children: [
                                         Padding(
                                           padding: EdgeInsets.symmetric(
                                               horizontal: height * 0.015,
                                               vertical: height * 0.001),
-                                          child: Text('Emergency Contact Number',
+                                          child: Text(
+                                              'Emergency Contact Number',
                                               style: kInputLabelStyle),
                                         ),
                                         Container(
                                             decoration: inputFieldDecoration,
-                                            height: height * 0.05,
+                                            // height: height * 0.05,
                                             width: width * 0.9,
                                             child: Row(
                                               children: [
                                                 SizedBox(
                                                   width: height * 0.015,
                                                 ),
-                                                FaIcon(FontAwesomeIcons.phoneAlt,
+                                                FaIcon(
+                                                    FontAwesomeIcons.phoneAlt,
                                                     size: height * 0.02,
                                                     color: Colors.white),
                                                 SizedBox(
@@ -1131,10 +1299,13 @@ class _RegisterPageState extends State<RegisterPage> {
                                                 ),
                                                 Expanded(
                                                   child: TextField(
-                                                    keyboardType: TextInputType.number,
+                                                    keyboardType:
+                                                        TextInputType.number,
                                                     decoration: InputDecoration(
-                                                        border: InputBorder.none,
-                                                        hintText: 'Enter contact number'),
+                                                        border:
+                                                            InputBorder.none,
+                                                        hintText:
+                                                            'Enter contact number'),
                                                     onChanged: (input) {
                                                       emergencyContact = input;
                                                     },
@@ -1143,101 +1314,133 @@ class _RegisterPageState extends State<RegisterPage> {
                                               ],
                                             ))
                                       ]),
-                                
-                            SizedBox(height: height * 0.01),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
+                                  SizedBox(height: height * 0.01),
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
-                                      Padding(
-                                        padding: EdgeInsets.symmetric(
-                                            horizontal: height * 0.015,
-                                            vertical: height * 0.001),
-                                        child: Text('Full Name',
-                                            style: kInputLabelStyle),
-                                      ),
-                                      Container(
-                                          decoration: inputFieldDecoration,
-                                          height: height * 0.05,
-                                          width: width * 0.425,
-                                          child: Row(
-                                            children: [
-                                              SizedBox(
-                                                width: height * 0.015,
-                                              ),
-                                              FaIcon(
-                                                  FontAwesomeIcons.userAlt,
-                                                  size: height * 0.02,
-                                                  color: Colors.white),
-                                              SizedBox(
-                                                width: height * 0.01,
-                                              ),
-                                              Expanded(
-                                                child: TextField(
-                                                  keyboardType:
-                                                      TextInputType.text,
-                                                  decoration: InputDecoration(
-                                                      border: InputBorder.none,
-                                                      hintText:
-                                                          'Name of person'),
-                                                  onChanged: (input) {
-                                                    emergencyName = input;
-                                                  },
-                                                ),
-                                              ),
-                                            ],
-                                          ))
-                                    ]),
-                                SizedBox(width: width * 0.05),
-                                Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Padding(
-                                        padding: EdgeInsets.symmetric(
-                                            horizontal: height * 0.015,
-                                            vertical: height * 0.001),
-                                        child: Text('Relationship',
-                                            style: kInputLabelStyle),
-                                      ),
-                                      Container(
-                                          decoration: inputFieldDecoration,
-                                          height: height * 0.05,
-                                          width: width * 0.425,
-                                          child: Row(
-                                            children: [
-                                              SizedBox(
-                                                width: height * 0.015,
-                                              ),
-                                              FaIcon(
-                                                  FontAwesomeIcons.solidHeart,
-                                                  size: height * 0.02,
-                                                  color: Colors.white),
-                                              SizedBox(
-                                                width: height * 0.01,
-                                              ),
-                                              Expanded(
-                                                child: TextField(
-                                                  keyboardType:
-                                                      TextInputType.text,
-                                                  decoration: InputDecoration(
-                                                      border: InputBorder.none,
-                                                      hintText: 'Enter relationship'),
-                                                  onChanged: (input) {
-                                                    emergencyRelationship = input;
-                                                  },
-                                                ),
-                                              ),
-                                            ],
-                                          ))
-                                    ]),
-                              ],
-                            ),
-                            SizedBox(height: height * 0.01),
-                            ],
+                                      Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Padding(
+                                              padding: EdgeInsets.symmetric(
+                                                  horizontal: height * 0.015,
+                                                  vertical: height * 0.001),
+                                              child: Text('Full Name',
+                                                  style: kInputLabelStyle),
+                                            ),
+                                            Container(
+                                                decoration:
+                                                    inputFieldDecoration,
+                                                // height: height * 0.05,
+                                                width: width * 0.425,
+                                                child: Row(
+                                                  children: [
+                                                    SizedBox(
+                                                      width: height * 0.015,
+                                                    ),
+                                                    FaIcon(
+                                                        FontAwesomeIcons
+                                                            .userAlt,
+                                                        size: height * 0.02,
+                                                        color: Colors.white),
+                                                    SizedBox(
+                                                      width: height * 0.01,
+                                                    ),
+                                                    Expanded(
+                                                      child: TextField(
+                                                        keyboardType:
+                                                            TextInputType.text,
+                                                        decoration: InputDecoration(
+                                                            border: InputBorder
+                                                                .none,
+                                                            hintText:
+                                                                'Name of person'),
+                                                        onChanged: (input) {
+                                                          emergencyName = input;
+                                                        },
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ))
+                                          ]),
+                                      SizedBox(width: width * 0.05),
+                                      Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Padding(
+                                              padding: EdgeInsets.symmetric(
+                                                  horizontal: height * 0.015,
+                                                  vertical: height * 0.001),
+                                              child: Text('Relationship',
+                                                  style: kInputLabelStyle),
+                                            ),
+                                            Container(
+                                                decoration:
+                                                    inputFieldDecoration,
+                                                // height: height * 0.05,
+                                                width: width * 0.425,
+                                                child: Row(
+                                                  children: [
+                                                    SizedBox(
+                                                      width: height * 0.015,
+                                                    ),
+                                                    FaIcon(
+                                                        FontAwesomeIcons
+                                                            .solidHeart,
+                                                        size: height * 0.02,
+                                                        color: Colors.white),
+                                                    SizedBox(
+                                                      width: height * 0.01,
+                                                    ),
+                                                    Expanded(
+                                                    child:
+                                                        DropdownButtonHideUnderline(
+                                                      child: DropdownButton<
+                                                          String>(
+                                                        hint: Text(emergencyRelationship),
+                                                        isExpanded: true,
+                                                        items: ['Father','Mother','Brother','Sister','Spouse','Son','Daughter','Son-in-Law','Daughter-in-Law','Friend','Others']
+                                                            .map(
+                                                                (String value) {
+                                                          return new DropdownMenuItem<
+                                                              String>(
+                                                            value: value,
+                                                            child: Text(value),
+                                                          );
+                                                        }).toList(),
+                                                        onChanged: (input) {
+                                                          setState(() {
+                                                            emergencyRelationship =input;
+                                                          });
+                                                          
+                                                        },
+                                                      ),
+                                                    ),
+                                                  ),
+                                                    // Expanded(
+                                                    //   child: TextField(
+                                                    //     keyboardType:
+                                                    //         TextInputType.text,
+                                                    //     decoration: InputDecoration(
+                                                    //         border: InputBorder
+                                                    //             .none,
+                                                    //         hintText:
+                                                    //             'Enter relationship'),
+                                                    //     onChanged: (input) {
+                                                    //       emergencyRelationship =
+                                                    //           input;
+                                                    //     },
+                                                    //   ),
+                                                    // ),
+                                                  ],
+                                                ))
+                                          ]),
+                                    ],
+                                  ),
+                                  SizedBox(height: height * 0.01),
+                                ],
                               ),
                             ),
                             SizedBox(height: height * 0.05),
@@ -1254,7 +1457,6 @@ class _RegisterPageState extends State<RegisterPage> {
                               ),
                               onPressed: () {
                                 saveUser();
-                                
                               },
                               style: ButtonStyle(
                                 foregroundColor:
@@ -1281,95 +1483,106 @@ class _RegisterPageState extends State<RegisterPage> {
       ),
     );
   }
-  saveUser(){
-    if(firstName==null){
+
+  String uid;
+  getUserId() {
+    final _auth = FirebaseAuth.instance;
+    final User user = _auth.currentUser;
+    uid = user.uid;
+    primarymobile = user.phoneNumber;
+    if (uid != null) {
+      print(uid);
+    } else {
+      snackBar('Something went wrong. Please sign in again!!');
+      Navigator.pop(context);
+    }
+  }
+
+  uploadFile() async {
+    FirebaseStorage storage = FirebaseStorage.instance;
+    Reference ref = storage.ref().child("$uid/profilePic");
+    ref.putFile(profilePic).then((data) => {
+          data.ref.getDownloadURL().then((url) {
+            user['profilePic'] = url.toString();
+          }).catchError((onError) {
+            snackBar('Unable to upload Profile Pic');
+          })
+        });
+  }
+
+  saveUser() {
+    if (firstName == null) {
       snackBar('Please Enter First Name correctly');
-    }
-    else if(lastName==null){
+    }else if(user['profilePic']==null || user['profilePic']==''){
+      snackBar('Please upload a profile Pic');
+    }else if (lastName == null) {
       snackBar('Please Enter Surname correctly');
-    }
-    else if(email==null){
+    } else if (email == null) {
       snackBar('Please Enter E-mail correctly');
-    }
-    else if(gender==null){
+    } else if (gender == null) {
       snackBar('Please Enter gender correctly');
-    }
-    else if(dob==null){
+    } else if (dob == null) {
       snackBar('Please Enter Date of Birth correctly');
-    }
-    else if(bloodGroup==null){
+    }else if (bloodGroup == null) {
       snackBar('Please Enter Blood Group correctly');
-    }
-    else if(disease==null){
+    } else if (disease == null) {
       snackBar('Please Enter Disease correctly');
-    }
-    else if(adhaar==null){
+    } else if (adhaar == null || adhaar.length!=12) {
       snackBar('Please Enter Adhaar Number correctly');
-    }
-    else if(address==null){
+    } else if (address == null) {
       snackBar('Please Enter Address correctly');
-    }
-    else if(locality==null){
+    } else if (locality == null) {
       snackBar('Please Enter Locality correctly');
-    }
-    else if(city==null){
+    } else if (city == null) {
       snackBar('Please Enter City correctly');
-    }
-    else if(state==null){
+    } else if (state == null) {
       snackBar('Please Enter State correctly');
-    }
-    else if(pincode==null){
+    } else if (pincode == null) {
       snackBar('Please Enter Pincode correctly');
-    }
-    else if(highestQualification==null){
+    } else if (highestQualification == null) {
       snackBar('Please Enter Highest Qualification correctly');
-    }
-    else if(professionalCareer==null){
+    } else if (professionalCareer == null) {
       snackBar('Please Enter Professional Career correctly');
-    }
-    else if(hobbies==null){
+    } else if (hobbies == null) {
       snackBar('Please Enter Hobbies correctly');
-    }
-    else if(emergencyContact==null){
+    } else if (emergencyContact == null) {
       snackBar('Please Enter Emergency Contact correctly');
-    }
-    else if(emergencyName==null){
+    } else if (emergencyName == null) {
       snackBar('Please Enter Emargency Contact Name correctly');
-    }
-    else if(emergencyRelationship==null){
+    } else if (emergencyRelationship == null) {
       snackBar('Please Enter Emergency Contact Relationship correctly');
-    }
-    else{
-      user['firstName']=firstName;
-      user['lastName']=lastName;
-      user['profilePic']="";
-      user['email']=email;
-      user['mobile']=[primarymobile,secmobile];
-      user['gender']=gender;
-      user['dob']=dob;
-      user['bloodGrp']=bloodGroup;
-      user['disease']=disease;
-      user['adhaar']=adhaar;
-      user['address']=address;
-      user['locality']=locality;
-      user['city']=city;
-      user['state']=state;
-      user['pinCode']=pincode;
-      user['highestQualification']=highestQualification;
-      user['professionalCareer']=professionalCareer;
-      user['hobbies']=hobbies;
-      user['emergencyContact']=emergencyContact;
-      user['emergencyName']=emergencyName;
-      user['emergencyRelation']=emergencyRelationship;
+    } else {
+      if(gender=='Male'){
+        user['firstName'] = 'Mr. '+firstName;
+      }
+      else if(gender=='Female'){
+        user['firstName'] = 'Ms. '+firstName;
+      }
+      user['lastName'] = lastName;
+      user['email'] = email;
+      user['mobile'] = [primarymobile, '+91'+secmobile];
+      user['gender'] = gender;
+      user['dob'] = dob;
+      user['bloodGrp'] = bloodGroup;
+      user['disease'] = disease;
+      user['adhaar'] = adhaar;
+      user['address'] = address;
+      user['locality'] = locality;
+      user['city'] = city;
+      user['state'] = state;
+      user['pinCode'] = pincode;
+      user['highestQualification'] = highestQualification;
+      user['professionalCareer'] = professionalCareer;
+      user['hobbies'] = hobbies;
+      user['emergencyContact'] = emergencyContact;
+      user['emergencyName'] = emergencyName;
+      user['emergencyRelation'] = emergencyRelationship;
       print(user);
       Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) => SkillAddPage(
-                                              termsAndConditions: false,
-                                              userData:user
-                                            )));
+          context,
+          MaterialPageRoute(
+              builder: (context) =>
+                  SkillAddPage(termsAndConditions: false, userData: user)));
     }
-    
   }
 }

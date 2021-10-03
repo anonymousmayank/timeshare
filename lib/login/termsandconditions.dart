@@ -37,16 +37,15 @@ class _TermsAndConditionsPageState extends State<TermsAndConditionsPage> {
     double height = MediaQuery.of(context).size.height;
     double width = MediaQuery.of(context).size.width;
     List<String> terms = [
-      '1.	Elder couples in the society living away from family members and children, sometimes find it difficult to utilise time effectively.',
-      '2.	They find it difficult to connect with suitable person of similar age group and skill set of mutual liking.',
-      '3.	In order to find such company, Share2care Foundation has developed this application for elder members for society to get connected with elder persons having similar skills. ',
-      '4.	By registering on this platform, you agree to follow the rules of the application.',
-      '5.	You will use this platform with very high moral, integrity and respect to guest members.',
-      '6.	You will not in any case harm other member of this platform.',
-      '7.	There will be no financial involvement for joining such meeting.',
-      '8.	Share2care Foundation shall be in no way responsible for any misconduct of either party and/or financial transaction, if any. ',
-      '9.	Share2care Foundation is attempting to provide the platform for good social purpose. ',
-      '10.	On exchange of the contact number between Guest(s) and Host, Share2care Foundation is not aware of further development amongst them. Hence total responsibility is of Guest and the host.  '
+      '1.	Elders sometimes find it difficult to connect with suitable person of similar age group and skills/interests of mutual liking.',
+      '2.	In order to find such company, Share2care Foundation has developed this application for elders of the society to get connected with elders having similar skills to live active social life.',
+      '3.	By registering on this platform, you agree to follow the rules of the application.',
+      '   A.	You will use this platform with very high moral, integrity and respect to guest members.',
+      ' 	B.  You will not in any case harm other member of this platform.',
+      ' 	C.  There will be no financial involvement for joining such meeting.',
+      ' 	D.  Share2care Foundation shall be in no way responsible for any misconduct of either party and/or financial transaction, if any. ',
+      '  	E.  Share2care Foundation is not responsible for any activity amongst users of this platform. ',
+      '   F.	On exchange of the contact number between Guest(s) and Host, Share2care Foundation is not aware of further development amongst them. Hence total responsibility is of Guest and the host.  '
     ];
     return Scaffold(
       body: Container(
@@ -87,17 +86,13 @@ class _TermsAndConditionsPageState extends State<TermsAndConditionsPage> {
                                 width: width * 0.9,
                                 child: Center(
                                   child: Text(
-                                    "ACCEPT",
+                                    "BACK",
                                     style: kButtonText,
                                   ),
                                 ),
                               ),
                               onPressed: () {
-                                Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) => SkillAddPage(
-                                            termsAndConditions: true)));
+                                Navigator.pop(context);
                               },
                               style: ButtonStyle(
                                 foregroundColor:
