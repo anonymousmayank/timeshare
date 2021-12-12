@@ -232,7 +232,7 @@ class _CloseEventsPageState extends State<CloseEventsPage> {
             Map meeting=unclosedMeetings[index]['data'];
             return Padding(
                   padding: EdgeInsets.symmetric(vertical: height * 0.003),
-                  child: Card(
+                  child:Card(
                       child: Padding(
                     padding: EdgeInsets.all(width * 0.016),
                     child: Column(
@@ -244,24 +244,27 @@ class _CloseEventsPageState extends State<CloseEventsPage> {
                             Card(
                               semanticContainer: true,
                               clipBehavior: Clip.antiAliasWithSaveLayer,
-                            child: CachedNetworkImage(
-                              width: width* 0.18,
-                              height:height * 0.1,
-                              imageUrl: meeting['hostProfilePic'],
-                              fit: BoxFit.cover,
-                              progressIndicatorBuilder: (context, url, downloadProgress) =>
-                              LinearProgressIndicator(
-                                  backgroundColor: blue3,
-                                  valueColor: AlwaysStoppedAnimation<Color>(blue1),
-                                  value: downloadProgress.progress),
-                              errorWidget: (context, url, error) => Icon(Icons.error),
+                              child: CachedNetworkImage(
+                                width: width * 0.18,
+                                height: height * 0.1,
+                                imageUrl: meeting['hostProfilePic'],
+                                fit: BoxFit.cover,
+                                progressIndicatorBuilder:
+                                    (context, url, downloadProgress) =>
+                                        LinearProgressIndicator(
+                                            backgroundColor: blue3,
+                                            valueColor:
+                                                AlwaysStoppedAnimation<Color>(
+                                                    blue1),
+                                            value: downloadProgress.progress),
+                                errorWidget: (context, url, error) =>
+                                    Icon(Icons.error),
+                              ),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8.0),
+                              ),
+                              elevation: 2,
                             ),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8.0),
-                            ),
-                            elevation: 2,
-                            ),
-                            
                             SizedBox(
                               width: width * 0.02,
                             ),
@@ -270,40 +273,61 @@ class _CloseEventsPageState extends State<CloseEventsPage> {
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    Row(children: [
-                                      Text('Date - '+meeting['date'].split('-').reversed.join('/')+', '+meeting['time'],
-                                        style: kHeading5Style.copyWith(
-                                            color: Colors.black45, fontWeight: FontWeight.w500)),
-                                      Spacer(),
-                                      FaIcon(
-                                          FontAwesomeIcons.clock,
-                                          size: height * 0.018,
-                                          color: Colors.black45,
-                                        ),
-                                        SizedBox(width: width * 0.005),
-                                        Text(meeting['duration'],
-                                            style: kHeading6Style.copyWith(
-                                                fontWeight: FontWeight.w400,
-                                                color: Colors.black45))
-                                    ],),
-                                    
-                                    Text(meeting['category'],
-                                        style: kHeading2Style.copyWith(
-                                            fontWeight: FontWeight.w500),
+                                    Row(
+                                      children: [
+                                        Text(
+                                            'Date - ' +
+                                                meeting['date']
+                                                    .split('-')
+                                                    .reversed
+                                                    .join('/') +
+                                                ', ' +
+                                                meeting['time'],
+                                            style: kHeading4Style.copyWith(
+                                                color: Colors.black54,
+                                                fontWeight: FontWeight.w500)),
+                                        Spacer(),
+                                      ],
+                                    ),
+                                    Row(
+                                      children: [
+                                        // FaIcon(
+                                        //     FontAwesomeIcons.clock,
+                                        //     size: height * 0.018,
+                                        //     color: Colors.black45,
+                                        //   ),
+                                        Text(
+                                            'Duration - ' + meeting['duration'],
+                                            style: kHeading4Style.copyWith(
+                                                color: Colors.black54,
+                                                fontWeight: FontWeight.w500)),
+                                        //   SizedBox(width: width * 0.005),
+                                        //   Text(';',
+                                        //       style: kHeading4Style.copyWith(
+                                        //           fontWeight: FontWeight.w500,
+                                        //           color: Colors.black54))
+                                      ],
+                                    ),
+                                    Text(
+                                      meeting['category'],
+                                      style: kHeading2Style.copyWith(
+                                          fontWeight: FontWeight.w500),
                                       softWrap: false,
-                                      overflow: TextOverflow.fade,),
+                                      overflow: TextOverflow.fade,
+                                    ),
                                     Row(
                                       children: [
                                         Text('HOST - ',
-                                            style: kHeading6Style.copyWith(
-                                                color: Colors.black45)),
+                                            style: kHeading5Style.copyWith(
+                                                color: Colors.black54)),
                                         Text(meeting['hostName'],
                                             style: kHeading5Style.copyWith(
                                                 color: blue3))
                                       ],
                                     ),
                                     Row(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
                                       children: [
                                         FaIcon(
                                           FontAwesomeIcons.mapMarkerAlt,
@@ -313,10 +337,12 @@ class _CloseEventsPageState extends State<CloseEventsPage> {
                                         SizedBox(width: width * 0.015),
                                         Expanded(
                                           child: Text(
-                                              meeting['address']+', '+meeting['city'],
-                                              style: kHeading6Style.copyWith(
+                                              meeting['address'] +
+                                                  ', ' +
+                                                  meeting['city'],
+                                              style: kHeading5Style.copyWith(
                                                   fontWeight: FontWeight.w400,
-                                                  color: Colors.black45)),
+                                                  color: Colors.black54)),
                                         )
                                       ],
                                     ),
@@ -342,127 +368,370 @@ class _CloseEventsPageState extends State<CloseEventsPage> {
                                 ),
                                 Spacer(),
                                 TextButton(
-                            child: Padding(
-                              padding: EdgeInsets.symmetric(
-                                  horizontal: width * 0.03),
-                              child: new Text(
-                                "Close",
-                                style: TextStyle(fontSize: height * 0.02),
-                              ),
-                            ),
-                            onPressed: () {
-                              showMaterialModalBottomSheet(
+                                  child: Padding(
+                                    padding: EdgeInsets.symmetric(vertical:6, horizontal: 16),
+                                    child: new Text(
+                                      "CLOSE",
+                                      style: TextStyle(
+                                          fontSize: height * 0.02,
+                                          color: Colors.white),
+                                    ),
+                                  ),
+                                  onPressed: () {
+                                    showMaterialModalBottomSheet(
                                 context: context,
                                 builder: (context) => Container(
-                                    height: height * 0.45,
-                                    child: Column(
-                                      children: [
-                                        SizedBox(height: height * 0.02),
-                                        Text('Close Meeting',
-                                            style: kHeading3Style.copyWith(
-                                                color: blue3)),
-                                        SizedBox(
-                                          height: height * 0.03,
-                                        ),
-                                        Text(
-                                            'Overall Experience of the meeting',
-                                            style: kHeading4Style),
-                                        SmoothStarRating(
-                                            allowHalfRating: false,
-                                            onRated: (v) {
-                                              rating=v;
+                                    // height: height * 0.45,
+                                    child: SingleChildScrollView(
+                                      child: Column(
+                                        children: [
+                                          SizedBox(height: height * 0.02),
+                                          Text('Close Meeting',
+                                              style: kHeading3Style.copyWith(
+                                                  color: blue3)),
+                                          SizedBox(
+                                            height: height * 0.03,
+                                          ),
+                                          Text(
+                                              'Overall Experience of the meeting',
+                                              style: kHeading4Style),
+                                          SmoothStarRating(
+                                              allowHalfRating: false,
+                                              onRated: (v) {
+                                                rating=v;
+                                              },
+                                              starCount: 5,
+                                              rating: 0,
+                                              size: 40.0,
+                                              color: blue3,
+                                              borderColor: blue3,
+                                              spacing: 0.0),
+                                          SizedBox(
+                                            height: height * 0.02,
+                                          ),
+                                          Text(
+                                              'Anything else you would like to say',
+                                              style: kHeading4Style),
+                                          Card(
+                                            child: Container(
+                                              width: width * 0.9,
+                                              decoration: new BoxDecoration(
+                                                  borderRadius:
+                                                      BorderRadius.circular(
+                                                          height * 0.005),
+                                                  color: Colors.white),
+                                              child: Padding(
+                                                padding: EdgeInsets.symmetric(
+                                                    horizontal: height * 0.01),
+                                                child: TextField(
+                                                  keyboardType:
+                                                      TextInputType.multiline,
+                                                  minLines: 5,
+                                                  maxLines: 7,
+                                                  decoration: InputDecoration(
+                                                      border: InputBorder.none,
+                                                      hintText: 'Enter Feedback'),
+                                                  onChanged: (input){
+                                                    feedback=input;
+                                                  },
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                          SizedBox(height: height * 0.04),
+                                          TextButton(
+                                            child: Container(
+                                              height: height * 0.035,
+                                              width: width * 0.9,
+                                              child: Center(
+                                                child: Text(
+                                                  "CLOSE",
+                                                  style: kButtonText,
+                                                ),
+                                              ),
+                                            ),
+                                            onPressed: () {
+                                              closeMeeting(unclosedMeetings[index]['id']);
+                                              Navigator.of(context).pop();
+                                              snackBar('Meeting Closed');
                                             },
-                                            starCount: 5,
-                                            rating: 0,
-                                            size: 40.0,
-                                            color: blue3,
-                                            borderColor: blue3,
-                                            spacing: 0.0),
-                                        SizedBox(
-                                          height: height * 0.02,
-                                        ),
-                                        Text(
-                                            'Anything else you would like to say',
-                                            style: kHeading4Style),
-                                        Card(
-                                          child: Container(
-                                            width: width * 0.9,
-                                            decoration: new BoxDecoration(
-                                                borderRadius:
-                                                    BorderRadius.circular(
-                                                        height * 0.005),
-                                                color: Colors.white),
-                                            child: Padding(
-                                              padding: EdgeInsets.symmetric(
-                                                  horizontal: height * 0.01),
-                                              child: TextField(
-                                                keyboardType:
-                                                    TextInputType.multiline,
-                                                minLines: 5,
-                                                maxLines: 7,
-                                                decoration: InputDecoration(
-                                                    border: InputBorder.none,
-                                                    hintText: 'Enter Feedback'),
-                                                onChanged: (input){
-                                                  feedback=input;
-                                                },
+                                            style: ButtonStyle(
+                                              foregroundColor:
+                                                  MaterialStateProperty.all<
+                                                      Color>(Colors.white),
+                                              backgroundColor:
+                                                  MaterialStateProperty.all<
+                                                      Color>(Colors.black),
+                                              shape: MaterialStateProperty.all(
+                                                RoundedRectangleBorder(
+                                                  borderRadius:
+                                                      BorderRadius.circular(30.0),
+                                                ),
                                               ),
                                             ),
                                           ),
-                                        ),
-                                        SizedBox(height: height * 0.04),
-                                        TextButton(
-                                          child: Container(
-                                            height: height * 0.035,
-                                            width: width * 0.9,
-                                            child: Center(
-                                              child: Text(
-                                                "CLOSE",
-                                                style: kButtonText,
-                                              ),
-                                            ),
-                                          ),
-                                          onPressed: () {
-                                            closeMeeting(unclosedMeetings[index]['id']);
-                                            Navigator.of(context).pop();
-                                            snackBar('Meeting Closed');
-                                          },
-                                          style: ButtonStyle(
-                                            foregroundColor:
-                                                MaterialStateProperty.all<
-                                                    Color>(Colors.white),
-                                            backgroundColor:
-                                                MaterialStateProperty.all<
-                                                    Color>(Colors.black),
-                                            shape: MaterialStateProperty.all(
-                                              RoundedRectangleBorder(
-                                                borderRadius:
-                                                    BorderRadius.circular(30.0),
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                      ],
+                                          SizedBox(height: height * 0.02),
+                                        ],
+                                      ),
                                     )),
                               );
-                            },
-                            style: ButtonStyle(
-                              foregroundColor: MaterialStateProperty.all<Color>(
-                                  Colors.white),
-                              backgroundColor:
-                                  MaterialStateProperty.all<Color>(blue3),
-                              shape: MaterialStateProperty.all(
-                                RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(30.0),
-                                ),
-                              ),
-                            ),
-                          )
+                                  },
+                                  style: ButtonStyle(
+                                    minimumSize: MaterialStateProperty.all(Size.zero),
+                                    padding: MaterialStateProperty.all(EdgeInsets.zero,),
+                                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                    foregroundColor:
+                                        MaterialStateProperty.all<Color>(
+                                            Colors.black),
+                                    backgroundColor:
+                                        MaterialStateProperty.all<Color>(blue3),
+                                    shape: MaterialStateProperty.all(
+                                      RoundedRectangleBorder(
+                                        borderRadius:
+                                            BorderRadius.circular(30.0),
+                                      ),
+                                    ),
+                                  ),
+                                )
                               ]),
                         ),
                       ],
                     ),
-                  ))
+                  ),),
+                  // child: Card(
+                  //     child: Padding(
+                  //   padding: EdgeInsets.all(width * 0.016),
+                  //   child: Column(
+                  //     children: [
+                  //       Row(
+                  //         mainAxisAlignment: MainAxisAlignment.start,
+                  //         crossAxisAlignment: CrossAxisAlignment.start,
+                  //         children: [
+                  //           Card(
+                  //             semanticContainer: true,
+                  //             clipBehavior: Clip.antiAliasWithSaveLayer,
+                  //           child: CachedNetworkImage(
+                  //             width: width* 0.18,
+                  //             height:height * 0.1,
+                  //             imageUrl: meeting['hostProfilePic'],
+                  //             fit: BoxFit.cover,
+                  //             progressIndicatorBuilder: (context, url, downloadProgress) =>
+                  //             LinearProgressIndicator(
+                  //                 backgroundColor: blue3,
+                  //                 valueColor: AlwaysStoppedAnimation<Color>(blue1),
+                  //                 value: downloadProgress.progress),
+                  //             errorWidget: (context, url, error) => Icon(Icons.error),
+                  //           ),
+                  //           shape: RoundedRectangleBorder(
+                  //             borderRadius: BorderRadius.circular(8.0),
+                  //           ),
+                  //           elevation: 2,
+                  //           ),
+                            
+                  //           SizedBox(
+                  //             width: width * 0.02,
+                  //           ),
+                  //           SizedBox(
+                  //               width: width * 0.62,
+                  //               child: Column(
+                  //                 crossAxisAlignment: CrossAxisAlignment.start,
+                  //                 children: [
+                  //                   Row(children: [
+                  //                     Text('Date - '+meeting['date'].split('-').reversed.join('/')+', '+meeting['time'],
+                  //                       style: kHeading5Style.copyWith(
+                  //                           color: Colors.black45, fontWeight: FontWeight.w500)),
+                  //                     Spacer(),
+                  //                     FaIcon(
+                  //                         FontAwesomeIcons.clock,
+                  //                         size: height * 0.018,
+                  //                         color: Colors.black45,
+                  //                       ),
+                  //                       SizedBox(width: width * 0.005),
+                  //                       Text(meeting['duration'],
+                  //                           style: kHeading6Style.copyWith(
+                  //                               fontWeight: FontWeight.w400,
+                  //                               color: Colors.black45))
+                  //                   ],),
+                                    
+                  //                   Text(meeting['category'],
+                  //                       style: kHeading2Style.copyWith(
+                  //                           fontWeight: FontWeight.w500),
+                  //                     softWrap: false,
+                  //                     overflow: TextOverflow.fade,),
+                  //                   Row(
+                  //                     children: [
+                  //                       Text('HOST - ',
+                  //                           style: kHeading6Style.copyWith(
+                  //                               color: Colors.black45)),
+                  //                       Text(meeting['hostName'],
+                  //                           style: kHeading5Style.copyWith(
+                  //                               color: blue3))
+                  //                     ],
+                  //                   ),
+                  //                   Row(
+                  //                     crossAxisAlignment: CrossAxisAlignment.start,
+                  //                     children: [
+                  //                       FaIcon(
+                  //                         FontAwesomeIcons.mapMarkerAlt,
+                  //                         size: height * 0.018,
+                  //                         color: Colors.black45,
+                  //                       ),
+                  //                       SizedBox(width: width * 0.015),
+                  //                       Expanded(
+                  //                         child: Text(
+                  //                             meeting['address']+', '+meeting['city'],
+                  //                             style: kHeading6Style.copyWith(
+                  //                                 fontWeight: FontWeight.w400,
+                  //                                 color: Colors.black45)),
+                  //                       )
+                  //                     ],
+                  //                   ),
+                  //                 ],
+                  //               ))
+                  //         ],
+                  //       ),
+                  //       Divider(
+                  //         color: blue3,
+                  //       ),
+                  //       Container(
+                  //         child: Row(
+                  //             crossAxisAlignment: CrossAxisAlignment.center,
+                  //             children: [
+                  //               Container(
+                  //                 decoration: BoxDecoration(
+                  //                     borderRadius:
+                  //                         BorderRadius.circular(height * 0.05),
+                  //                     color: blue3.withOpacity(0.5)),
+                  //                 child: Row(
+                  //                     children: makeAttendeeCircles(
+                  //                         height, width, meeting['attendees'])),
+                  //               ),
+                  //               Spacer(),
+                  //               TextButton(
+                  //           child: Padding(
+                  //             padding: EdgeInsets.symmetric(
+                  //                 horizontal: width * 0.03),
+                  //             child: new Text(
+                  //               "Close",
+                  //               style: TextStyle(fontSize: height * 0.02),
+                  //             ),
+                  //           ),
+                  //           onPressed: () {
+                  //             showMaterialModalBottomSheet(
+                  //               context: context,
+                  //               builder: (context) => Container(
+                  //                   // height: height * 0.45,
+                  //                   child: SingleChildScrollView(
+                  //                     child: Column(
+                  //                       children: [
+                  //                         SizedBox(height: height * 0.02),
+                  //                         Text('Close Meeting',
+                  //                             style: kHeading3Style.copyWith(
+                  //                                 color: blue3)),
+                  //                         SizedBox(
+                  //                           height: height * 0.03,
+                  //                         ),
+                  //                         Text(
+                  //                             'Overall Experience of the meeting',
+                  //                             style: kHeading4Style),
+                  //                         SmoothStarRating(
+                  //                             allowHalfRating: false,
+                  //                             onRated: (v) {
+                  //                               rating=v;
+                  //                             },
+                  //                             starCount: 5,
+                  //                             rating: 0,
+                  //                             size: 40.0,
+                  //                             color: blue3,
+                  //                             borderColor: blue3,
+                  //                             spacing: 0.0),
+                  //                         SizedBox(
+                  //                           height: height * 0.02,
+                  //                         ),
+                  //                         Text(
+                  //                             'Anything else you would like to say',
+                  //                             style: kHeading4Style),
+                  //                         Card(
+                  //                           child: Container(
+                  //                             width: width * 0.9,
+                  //                             decoration: new BoxDecoration(
+                  //                                 borderRadius:
+                  //                                     BorderRadius.circular(
+                  //                                         height * 0.005),
+                  //                                 color: Colors.white),
+                  //                             child: Padding(
+                  //                               padding: EdgeInsets.symmetric(
+                  //                                   horizontal: height * 0.01),
+                  //                               child: TextField(
+                  //                                 keyboardType:
+                  //                                     TextInputType.multiline,
+                  //                                 minLines: 5,
+                  //                                 maxLines: 7,
+                  //                                 decoration: InputDecoration(
+                  //                                     border: InputBorder.none,
+                  //                                     hintText: 'Enter Feedback'),
+                  //                                 onChanged: (input){
+                  //                                   feedback=input;
+                  //                                 },
+                  //                               ),
+                  //                             ),
+                  //                           ),
+                  //                         ),
+                  //                         SizedBox(height: height * 0.04),
+                  //                         TextButton(
+                  //                           child: Container(
+                  //                             height: height * 0.035,
+                  //                             width: width * 0.9,
+                  //                             child: Center(
+                  //                               child: Text(
+                  //                                 "CLOSE",
+                  //                                 style: kButtonText,
+                  //                               ),
+                  //                             ),
+                  //                           ),
+                  //                           onPressed: () {
+                  //                             closeMeeting(unclosedMeetings[index]['id']);
+                  //                             Navigator.of(context).pop();
+                  //                             snackBar('Meeting Closed');
+                  //                           },
+                  //                           style: ButtonStyle(
+                  //                             foregroundColor:
+                  //                                 MaterialStateProperty.all<
+                  //                                     Color>(Colors.white),
+                  //                             backgroundColor:
+                  //                                 MaterialStateProperty.all<
+                  //                                     Color>(Colors.black),
+                  //                             shape: MaterialStateProperty.all(
+                  //                               RoundedRectangleBorder(
+                  //                                 borderRadius:
+                  //                                     BorderRadius.circular(30.0),
+                  //                               ),
+                  //                             ),
+                  //                           ),
+                  //                         ),
+                  //                         SizedBox(height: height * 0.02),
+                  //                       ],
+                  //                     ),
+                  //                   )),
+                  //             );
+                  //           },
+                  //           style: ButtonStyle(
+                  //             foregroundColor: MaterialStateProperty.all<Color>(
+                  //                 Colors.white),
+                  //             backgroundColor:
+                  //                 MaterialStateProperty.all<Color>(blue3),
+                  //             shape: MaterialStateProperty.all(
+                  //               RoundedRectangleBorder(
+                  //                 borderRadius: BorderRadius.circular(30.0),
+                  //               ),
+                  //             ),
+                  //           ),
+                  //         )
+                  //             ]),
+                  //       ),
+                  //     ],
+                  //   ),
+                  // ))
                   );
           } else {
             return SizedBox(height: height * 0.01);

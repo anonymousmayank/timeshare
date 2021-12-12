@@ -296,7 +296,7 @@ class _SchedulePageState extends State<SchedulePage>
             });
             return Padding(
                   padding: EdgeInsets.symmetric(vertical: height * 0.003),
-                  child: Card(
+                  child:Card(
                       child: Padding(
                     padding: EdgeInsets.all(width * 0.016),
                     child: Column(
@@ -308,24 +308,27 @@ class _SchedulePageState extends State<SchedulePage>
                             Card(
                               semanticContainer: true,
                               clipBehavior: Clip.antiAliasWithSaveLayer,
-                            child: CachedNetworkImage(
-                              width: width* 0.18,
-                              height:height * 0.1,
-                              imageUrl: meeting['hostProfilePic'],
-                              fit: BoxFit.cover,
-                              progressIndicatorBuilder: (context, url, downloadProgress) =>
-                              LinearProgressIndicator(
-                                  backgroundColor: blue3,
-                                  valueColor: AlwaysStoppedAnimation<Color>(blue1),
-                                  value: downloadProgress.progress),
-                              errorWidget: (context, url, error) => Icon(Icons.error),
+                              child: CachedNetworkImage(
+                                width: width * 0.18,
+                                height: height * 0.1,
+                                imageUrl: meeting['hostProfilePic'],
+                                fit: BoxFit.cover,
+                                progressIndicatorBuilder:
+                                    (context, url, downloadProgress) =>
+                                        LinearProgressIndicator(
+                                            backgroundColor: blue3,
+                                            valueColor:
+                                                AlwaysStoppedAnimation<Color>(
+                                                    blue1),
+                                            value: downloadProgress.progress),
+                                errorWidget: (context, url, error) =>
+                                    Icon(Icons.error),
+                              ),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8.0),
+                              ),
+                              elevation: 2,
                             ),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8.0),
-                            ),
-                            elevation: 2,
-                            ),
-                            
                             SizedBox(
                               width: width * 0.02,
                             ),
@@ -334,40 +337,61 @@ class _SchedulePageState extends State<SchedulePage>
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    Row(children: [
-                                      Text('Date - '+meeting['date'].split('-').reversed.join('/')+', '+meeting['time'],
-                                        style: kHeading5Style.copyWith(
-                                            color: Colors.black45, fontWeight: FontWeight.w500)),
-                                      Spacer(),
-                                      FaIcon(
-                                          FontAwesomeIcons.clock,
-                                          size: height * 0.018,
-                                          color: Colors.black45,
-                                        ),
-                                        SizedBox(width: width * 0.005),
-                                        Text(meeting['duration'],
-                                            style: kHeading6Style.copyWith(
-                                                fontWeight: FontWeight.w400,
-                                                color: Colors.black45))
-                                    ],),
-                                    
-                                    Text(meeting['category'],
-                                        style: kHeading2Style.copyWith(
-                                            fontWeight: FontWeight.w500),
+                                    Row(
+                                      children: [
+                                        Text(
+                                            'Date - ' +
+                                                meeting['date']
+                                                    .split('-')
+                                                    .reversed
+                                                    .join('/') +
+                                                ', ' +
+                                                meeting['time'],
+                                            style: kHeading4Style.copyWith(
+                                                color: Colors.black54,
+                                                fontWeight: FontWeight.w500)),
+                                        Spacer(),
+                                      ],
+                                    ),
+                                    Row(
+                                      children: [
+                                        // FaIcon(
+                                        //     FontAwesomeIcons.clock,
+                                        //     size: height * 0.018,
+                                        //     color: Colors.black45,
+                                        //   ),
+                                        Text(
+                                            'Duration - ' + meeting['duration'],
+                                            style: kHeading4Style.copyWith(
+                                                color: Colors.black54,
+                                                fontWeight: FontWeight.w500)),
+                                        //   SizedBox(width: width * 0.005),
+                                        //   Text(';',
+                                        //       style: kHeading4Style.copyWith(
+                                        //           fontWeight: FontWeight.w500,
+                                        //           color: Colors.black54))
+                                      ],
+                                    ),
+                                    Text(
+                                      meeting['category'],
+                                      style: kHeading2Style.copyWith(
+                                          fontWeight: FontWeight.w500),
                                       softWrap: false,
-                                      overflow: TextOverflow.fade,),
+                                      overflow: TextOverflow.fade,
+                                    ),
                                     Row(
                                       children: [
                                         Text('HOST - ',
-                                            style: kHeading6Style.copyWith(
-                                                color: Colors.black45)),
+                                            style: kHeading5Style.copyWith(
+                                                color: Colors.black54)),
                                         Text(meeting['hostName'],
                                             style: kHeading5Style.copyWith(
                                                 color: blue3))
                                       ],
                                     ),
                                     Row(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
                                       children: [
                                         FaIcon(
                                           FontAwesomeIcons.mapMarkerAlt,
@@ -377,10 +401,12 @@ class _SchedulePageState extends State<SchedulePage>
                                         SizedBox(width: width * 0.015),
                                         Expanded(
                                           child: Text(
-                                              meeting['address']+', '+meeting['city'],
-                                              style: kHeading6Style.copyWith(
+                                              meeting['address'] +
+                                                  ', ' +
+                                                  meeting['city'],
+                                              style: kHeading5Style.copyWith(
                                                   fontWeight: FontWeight.w400,
-                                                  color: Colors.black45)),
+                                                  color: Colors.black54)),
                                         )
                                       ],
                                     ),
@@ -406,59 +432,27 @@ class _SchedulePageState extends State<SchedulePage>
                                 ),
                                 Spacer(),
                                 TextButton(
-                            child: Padding(
-                              padding: EdgeInsets.symmetric(
-                                  horizontal: width * 0.02),
-                              child: new Text(
-                                requestsId.contains(uid)
-                                    ? "Pending"
-                                    : attendeesId.contains(uid)
-                                        ? "Joined"
-                                        : "Declined",
-                                style: TextStyle(fontSize: height * 0.02),
-                              ),
-                            ),
-                            onPressed: null,
-                            style: ButtonStyle(
-                              foregroundColor: MaterialStateProperty.all<Color>(
-                                  Colors.black),
-                              backgroundColor: MaterialStateProperty.all<Color>(
-                                  requestsId.contains(uid)
-                                      ? Colors.white
-                                      : attendeesId.contains(uid)
-                                          ? Color(0xFF00e600)
-                                          : Colors.red),
-                              shape: MaterialStateProperty.all(
-                                RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(30.0),
-                                  side: BorderSide(
-                                      color: Colors.black, width: 1.5),
-                                ),
-                              ),
-                            ),
-                          ),
-                          SizedBox(width: width * 0.015),
-                          (requestsId.contains(uid) ||
-                                  attendeesId.contains(uid))
-                              ? TextButton(
                                   child: Padding(
-                                    padding: EdgeInsets.symmetric(
-                                        horizontal: width * 0.02),
+                                    padding: EdgeInsets.symmetric(vertical:6, horizontal: 16),
                                     child: new Text(
                                       "Cancel",
-                                      style: TextStyle(fontSize: height * 0.02),
+                                      style: TextStyle(
+                                          fontSize: height * 0.02,
+                                          color: Colors.white),
                                     ),
                                   ),
-                                  onPressed: (){
+                                  onPressed: () {
                                     cancelRequest(joinedMeetings[index]['id'], joinedMeetings[index]['data']);
                                   },
                                   style: ButtonStyle(
+                                    minimumSize: MaterialStateProperty.all(Size.zero),
+                                    padding: MaterialStateProperty.all(EdgeInsets.zero,),
+                                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                                     foregroundColor:
                                         MaterialStateProperty.all<Color>(
-                                            Colors.white),
+                                            Colors.black),
                                     backgroundColor:
-                                        MaterialStateProperty.all<Color>(
-                                            Colors.red),
+                                        MaterialStateProperty.all<Color>(blue3),
                                     shape: MaterialStateProperty.all(
                                       RoundedRectangleBorder(
                                         borderRadius:
@@ -467,12 +461,188 @@ class _SchedulePageState extends State<SchedulePage>
                                     ),
                                   ),
                                 )
-                              : Center()
                               ]),
                         ),
                       ],
                     ),
-                  ))
+                  ),)
+                  // child: Card(
+                  //     child: Padding(
+                  //   padding: EdgeInsets.all(width * 0.016),
+                  //   child: Column(
+                  //     children: [
+                  //       Row(
+                  //         mainAxisAlignment: MainAxisAlignment.start,
+                  //         crossAxisAlignment: CrossAxisAlignment.start,
+                  //         children: [
+                  //           Card(
+                  //             semanticContainer: true,
+                  //             clipBehavior: Clip.antiAliasWithSaveLayer,
+                  //           child: CachedNetworkImage(
+                  //             width: width* 0.18,
+                  //             height:height * 0.1,
+                  //             imageUrl: meeting['hostProfilePic'],
+                  //             fit: BoxFit.cover,
+                  //             progressIndicatorBuilder: (context, url, downloadProgress) =>
+                  //             LinearProgressIndicator(
+                  //                 backgroundColor: blue3,
+                  //                 valueColor: AlwaysStoppedAnimation<Color>(blue1),
+                  //                 value: downloadProgress.progress),
+                  //             errorWidget: (context, url, error) => Icon(Icons.error),
+                  //           ),
+                  //           shape: RoundedRectangleBorder(
+                  //             borderRadius: BorderRadius.circular(8.0),
+                  //           ),
+                  //           elevation: 2,
+                  //           ),
+                            
+                  //           SizedBox(
+                  //             width: width * 0.02,
+                  //           ),
+                  //           SizedBox(
+                  //               width: width * 0.62,
+                  //               child: Column(
+                  //                 crossAxisAlignment: CrossAxisAlignment.start,
+                  //                 children: [
+                  //                   Row(children: [
+                  //                     Text('Date - '+meeting['date'].split('-').reversed.join('/')+', '+meeting['time'],
+                  //                       style: kHeading5Style.copyWith(
+                  //                           color: Colors.black45, fontWeight: FontWeight.w500)),
+                  //                     Spacer(),
+                  //                     FaIcon(
+                  //                         FontAwesomeIcons.clock,
+                  //                         size: height * 0.018,
+                  //                         color: Colors.black45,
+                  //                       ),
+                  //                       SizedBox(width: width * 0.005),
+                  //                       Text(meeting['duration'],
+                  //                           style: kHeading6Style.copyWith(
+                  //                               fontWeight: FontWeight.w400,
+                  //                               color: Colors.black45))
+                  //                   ],),
+                                    
+                  //                   Text(meeting['category'],
+                  //                       style: kHeading2Style.copyWith(
+                  //                           fontWeight: FontWeight.w500),
+                  //                     softWrap: false,
+                  //                     overflow: TextOverflow.fade,),
+                  //                   Row(
+                  //                     children: [
+                  //                       Text('HOST - ',
+                  //                           style: kHeading6Style.copyWith(
+                  //                               color: Colors.black45)),
+                  //                       Text(meeting['hostName'],
+                  //                           style: kHeading5Style.copyWith(
+                  //                               color: blue3))
+                  //                     ],
+                  //                   ),
+                  //                   Row(
+                  //                     crossAxisAlignment: CrossAxisAlignment.start,
+                  //                     children: [
+                  //                       FaIcon(
+                  //                         FontAwesomeIcons.mapMarkerAlt,
+                  //                         size: height * 0.018,
+                  //                         color: Colors.black45,
+                  //                       ),
+                  //                       SizedBox(width: width * 0.015),
+                  //                       Expanded(
+                  //                         child: Text(
+                  //                             meeting['address']+', '+meeting['city'],
+                  //                             style: kHeading6Style.copyWith(
+                  //                                 fontWeight: FontWeight.w400,
+                  //                                 color: Colors.black45)),
+                  //                       )
+                  //                     ],
+                  //                   ),
+                  //                 ],
+                  //               ))
+                  //         ],
+                  //       ),
+                  //       Divider(
+                  //         color: blue3,
+                  //       ),
+                  //       Container(
+                  //         child: Row(
+                  //             crossAxisAlignment: CrossAxisAlignment.center,
+                  //             children: [
+                  //               Container(
+                  //                 decoration: BoxDecoration(
+                  //                     borderRadius:
+                  //                         BorderRadius.circular(height * 0.05),
+                  //                     color: blue3.withOpacity(0.5)),
+                  //                 child: Row(
+                  //                     children: makeAttendeeCircles(
+                  //                         height, width, meeting['attendees'])),
+                  //               ),
+                  //               Spacer(),
+                  //               TextButton(
+                  //           child: Padding(
+                  //             padding: EdgeInsets.symmetric(
+                  //                 horizontal: width * 0.02),
+                  //             child: new Text(
+                  //               requestsId.contains(uid)
+                  //                   ? "Pending"
+                  //                   : attendeesId.contains(uid)
+                  //                       ? "Joined"
+                  //                       : "Declined",
+                  //               style: TextStyle(fontSize: height * 0.02),
+                  //             ),
+                  //           ),
+                  //           onPressed: null,
+                  //           style: ButtonStyle(
+                  //             foregroundColor: MaterialStateProperty.all<Color>(
+                  //                 Colors.black),
+                  //             backgroundColor: MaterialStateProperty.all<Color>(
+                  //                 requestsId.contains(uid)
+                  //                     ? Colors.white
+                  //                     : attendeesId.contains(uid)
+                  //                         ? Color(0xFF00e600)
+                  //                         : Colors.red),
+                  //             shape: MaterialStateProperty.all(
+                  //               RoundedRectangleBorder(
+                  //                 borderRadius: BorderRadius.circular(30.0),
+                  //                 side: BorderSide(
+                  //                     color: Colors.black, width: 1.5),
+                  //               ),
+                  //             ),
+                  //           ),
+                  //         ),
+                  //         SizedBox(width: width * 0.015),
+                  //         (requestsId.contains(uid) ||
+                  //                 attendeesId.contains(uid))
+                  //             ? TextButton(
+                  //                 child: Padding(
+                  //                   padding: EdgeInsets.symmetric(
+                  //                       horizontal: width * 0.02),
+                  //                   child: new Text(
+                  //                     "Cancel",
+                  //                     style: TextStyle(fontSize: height * 0.02),
+                  //                   ),
+                  //                 ),
+                  //                 onPressed: (){
+                  //                   cancelRequest(joinedMeetings[index]['id'], joinedMeetings[index]['data']);
+                  //                 },
+                  //                 style: ButtonStyle(
+                  //                   foregroundColor:
+                  //                       MaterialStateProperty.all<Color>(
+                  //                           Colors.white),
+                  //                   backgroundColor:
+                  //                       MaterialStateProperty.all<Color>(
+                  //                           Colors.red),
+                  //                   shape: MaterialStateProperty.all(
+                  //                     RoundedRectangleBorder(
+                  //                       borderRadius:
+                  //                           BorderRadius.circular(30.0),
+                  //                     ),
+                  //                   ),
+                  //                 ),
+                  //               )
+                  //             : Center()
+                  //             ]),
+                  //       ),
+                  //     ],
+                  //   ),
+                  // ))
                   );
           } else {
             return SizedBox(height: height * 0.08);
@@ -490,7 +660,7 @@ class _SchedulePageState extends State<SchedulePage>
             String meetingID=myMeetings[index]['id'];
             return Padding(
                   padding: EdgeInsets.symmetric(vertical: height * 0.003),
-                  child: Card(
+                  child:Card(
                       child: Padding(
                     padding: EdgeInsets.all(width * 0.016),
                     child: Column(
@@ -502,24 +672,27 @@ class _SchedulePageState extends State<SchedulePage>
                             Card(
                               semanticContainer: true,
                               clipBehavior: Clip.antiAliasWithSaveLayer,
-                            child: CachedNetworkImage(
-                              width: width* 0.18,
-                              height:height * 0.1,
-                              imageUrl: meeting['hostProfilePic'],
-                              fit: BoxFit.cover,
-                              progressIndicatorBuilder: (context, url, downloadProgress) =>
-                              LinearProgressIndicator(
-                                  backgroundColor: blue3,
-                                  valueColor: AlwaysStoppedAnimation<Color>(blue1),
-                                  value: downloadProgress.progress),
-                              errorWidget: (context, url, error) => Icon(Icons.error),
+                              child: CachedNetworkImage(
+                                width: width * 0.18,
+                                height: height * 0.1,
+                                imageUrl: meeting['hostProfilePic'],
+                                fit: BoxFit.cover,
+                                progressIndicatorBuilder:
+                                    (context, url, downloadProgress) =>
+                                        LinearProgressIndicator(
+                                            backgroundColor: blue3,
+                                            valueColor:
+                                                AlwaysStoppedAnimation<Color>(
+                                                    blue1),
+                                            value: downloadProgress.progress),
+                                errorWidget: (context, url, error) =>
+                                    Icon(Icons.error),
+                              ),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8.0),
+                              ),
+                              elevation: 2,
                             ),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8.0),
-                            ),
-                            elevation: 2,
-                            ),
-                            
                             SizedBox(
                               width: width * 0.02,
                             ),
@@ -528,40 +701,61 @@ class _SchedulePageState extends State<SchedulePage>
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    Row(children: [
-                                      Text('Date - '+meeting['date'].split('-').reversed.join('/')+', '+meeting['time'],
-                                        style: kHeading5Style.copyWith(
-                                            color: Colors.black45, fontWeight: FontWeight.w500)),
-                                      Spacer(),
-                                      FaIcon(
-                                          FontAwesomeIcons.clock,
-                                          size: height * 0.018,
-                                          color: Colors.black45,
-                                        ),
-                                        SizedBox(width: width * 0.005),
-                                        Text(meeting['duration'],
-                                            style: kHeading6Style.copyWith(
-                                                fontWeight: FontWeight.w400,
-                                                color: Colors.black45))
-                                    ],),
-                                    
-                                    Text(meeting['category'],
-                                        style: kHeading2Style.copyWith(
-                                            fontWeight: FontWeight.w500),
+                                    Row(
+                                      children: [
+                                        Text(
+                                            'Date - ' +
+                                                meeting['date']
+                                                    .split('-')
+                                                    .reversed
+                                                    .join('/') +
+                                                ', ' +
+                                                meeting['time'],
+                                            style: kHeading4Style.copyWith(
+                                                color: Colors.black54,
+                                                fontWeight: FontWeight.w500)),
+                                        Spacer(),
+                                      ],
+                                    ),
+                                    Row(
+                                      children: [
+                                        // FaIcon(
+                                        //     FontAwesomeIcons.clock,
+                                        //     size: height * 0.018,
+                                        //     color: Colors.black45,
+                                        //   ),
+                                        Text(
+                                            'Duration - ' + meeting['duration'],
+                                            style: kHeading4Style.copyWith(
+                                                color: Colors.black54,
+                                                fontWeight: FontWeight.w500)),
+                                        //   SizedBox(width: width * 0.005),
+                                        //   Text(';',
+                                        //       style: kHeading4Style.copyWith(
+                                        //           fontWeight: FontWeight.w500,
+                                        //           color: Colors.black54))
+                                      ],
+                                    ),
+                                    Text(
+                                      meeting['category'],
+                                      style: kHeading2Style.copyWith(
+                                          fontWeight: FontWeight.w500),
                                       softWrap: false,
-                                      overflow: TextOverflow.fade,),
+                                      overflow: TextOverflow.fade,
+                                    ),
                                     Row(
                                       children: [
                                         Text('HOST - ',
-                                            style: kHeading6Style.copyWith(
-                                                color: Colors.black45)),
+                                            style: kHeading5Style.copyWith(
+                                                color: Colors.black54)),
                                         Text(meeting['hostName'],
                                             style: kHeading5Style.copyWith(
                                                 color: blue3))
                                       ],
                                     ),
                                     Row(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
                                       children: [
                                         FaIcon(
                                           FontAwesomeIcons.mapMarkerAlt,
@@ -571,10 +765,12 @@ class _SchedulePageState extends State<SchedulePage>
                                         SizedBox(width: width * 0.015),
                                         Expanded(
                                           child: Text(
-                                              meeting['address']+', '+meeting['city'],
-                                              style: kHeading6Style.copyWith(
+                                              meeting['address'] +
+                                                  ', ' +
+                                                  meeting['city'],
+                                              style: kHeading5Style.copyWith(
                                                   fontWeight: FontWeight.w400,
-                                                  color: Colors.black45)),
+                                                  color: Colors.black54)),
                                         )
                                       ],
                                     ),
@@ -600,64 +796,212 @@ class _SchedulePageState extends State<SchedulePage>
                                 ),
                                 Spacer(),
                                 TextButton(
-                            child: Padding(
-                              padding: EdgeInsets.symmetric(
-                                  horizontal: width * 0.03),
-                              child: new Text(
-                                "Requests",
-                                style: TextStyle(fontSize: height * 0.02),
-                              ),
-                            ),
-                            onPressed: () {
-                              Navigator.push(
+                                  child: Padding(
+                                    padding: EdgeInsets.symmetric(vertical:6, horizontal: 16),
+                                    child: new Text(
+                                      "Requests",
+                                      style: TextStyle(
+                                          fontSize: height * 0.02,
+                                          color: Colors.white),
+                                    ),
+                                  ),
+                                  onPressed: () {
+                                    Navigator.push(
                                   context,
                                   MaterialPageRoute(
                                       builder: (context) => EventRequestPage(meeting:meeting,
                                           meetingID: meetingID)));
-                            },
-                            style: ButtonStyle(
-                              foregroundColor: MaterialStateProperty.all<Color>(
-                                  Colors.white),
-                              backgroundColor:
-                                  MaterialStateProperty.all<Color>(blue3),
-                              shape: MaterialStateProperty.all(
-                                RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(30.0),
-                                ),
-                              ),
-                            ),
-                          ),
-                          // SizedBox(width: width * 0.015),
-                          // TextButton(
-                          //         child: Padding(
-                          //           padding: EdgeInsets.symmetric(
-                          //               horizontal: width * 0.02),
-                          //           child: new Text(
-                          //             "Cancel",
-                          //             style: TextStyle(fontSize: height * 0.02),
-                          //           ),
-                          //         ),
-                          //         onPressed: null,
-                          //         style: ButtonStyle(
-                          //           foregroundColor:
-                          //               MaterialStateProperty.all<Color>(
-                          //                   Colors.white),
-                          //           backgroundColor:
-                          //               MaterialStateProperty.all<Color>(
-                          //                   Colors.red),
-                          //           shape: MaterialStateProperty.all(
-                          //             RoundedRectangleBorder(
-                          //               borderRadius:
-                          //                   BorderRadius.circular(30.0),
-                          //             ),
-                          //           ),
-                          //         ),
-                          //       )
+                                  },
+                                  style: ButtonStyle(
+                                    minimumSize: MaterialStateProperty.all(Size.zero),
+                                    padding: MaterialStateProperty.all(EdgeInsets.zero,),
+                                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                    foregroundColor:
+                                        MaterialStateProperty.all<Color>(
+                                            Colors.black),
+                                    backgroundColor:
+                                        MaterialStateProperty.all<Color>(blue3),
+                                    shape: MaterialStateProperty.all(
+                                      RoundedRectangleBorder(
+                                        borderRadius:
+                                            BorderRadius.circular(30.0),
+                                      ),
+                                    ),
+                                  ),
+                                )
                               ]),
                         ),
                       ],
                     ),
-                  ))
+                  ),),
+                  // child: Card(
+                  //     child: Padding(
+                  //   padding: EdgeInsets.all(width * 0.016),
+                  //   child: Column(
+                  //     children: [
+                  //       Row(
+                  //         mainAxisAlignment: MainAxisAlignment.start,
+                  //         crossAxisAlignment: CrossAxisAlignment.start,
+                  //         children: [
+                  //           Card(
+                  //             semanticContainer: true,
+                  //             clipBehavior: Clip.antiAliasWithSaveLayer,
+                  //           child: CachedNetworkImage(
+                  //             width: width* 0.18,
+                  //             height:height * 0.1,
+                  //             imageUrl: meeting['hostProfilePic'],
+                  //             fit: BoxFit.cover,
+                  //             progressIndicatorBuilder: (context, url, downloadProgress) =>
+                  //             LinearProgressIndicator(
+                  //                 backgroundColor: blue3,
+                  //                 valueColor: AlwaysStoppedAnimation<Color>(blue1),
+                  //                 value: downloadProgress.progress),
+                  //             errorWidget: (context, url, error) => Icon(Icons.error),
+                  //           ),
+                  //           shape: RoundedRectangleBorder(
+                  //             borderRadius: BorderRadius.circular(8.0),
+                  //           ),
+                  //           elevation: 2,
+                  //           ),
+                            
+                  //           SizedBox(
+                  //             width: width * 0.02,
+                  //           ),
+                  //           SizedBox(
+                  //               width: width * 0.62,
+                  //               child: Column(
+                  //                 crossAxisAlignment: CrossAxisAlignment.start,
+                  //                 children: [
+                  //                   Row(children: [
+                  //                     Text('Date - '+meeting['date'].split('-').reversed.join('/')+', '+meeting['time'],
+                  //                       style: kHeading5Style.copyWith(
+                  //                           color: Colors.black45, fontWeight: FontWeight.w500)),
+                  //                     Spacer(),
+                  //                     FaIcon(
+                  //                         FontAwesomeIcons.clock,
+                  //                         size: height * 0.018,
+                  //                         color: Colors.black45,
+                  //                       ),
+                  //                       SizedBox(width: width * 0.005),
+                  //                       Text(meeting['duration'],
+                  //                           style: kHeading6Style.copyWith(
+                  //                               fontWeight: FontWeight.w400,
+                  //                               color: Colors.black45))
+                  //                   ],),
+                                    
+                  //                   Text(meeting['category'],
+                  //                       style: kHeading2Style.copyWith(
+                  //                           fontWeight: FontWeight.w500),
+                  //                     softWrap: false,
+                  //                     overflow: TextOverflow.fade,),
+                  //                   Row(
+                  //                     children: [
+                  //                       Text('HOST - ',
+                  //                           style: kHeading6Style.copyWith(
+                  //                               color: Colors.black45)),
+                  //                       Text(meeting['hostName'],
+                  //                           style: kHeading5Style.copyWith(
+                  //                               color: blue3))
+                  //                     ],
+                  //                   ),
+                  //                   Row(
+                  //                     crossAxisAlignment: CrossAxisAlignment.start,
+                  //                     children: [
+                  //                       FaIcon(
+                  //                         FontAwesomeIcons.mapMarkerAlt,
+                  //                         size: height * 0.018,
+                  //                         color: Colors.black45,
+                  //                       ),
+                  //                       SizedBox(width: width * 0.015),
+                  //                       Expanded(
+                  //                         child: Text(
+                  //                             meeting['address']+', '+meeting['city'],
+                  //                             style: kHeading6Style.copyWith(
+                  //                                 fontWeight: FontWeight.w400,
+                  //                                 color: Colors.black45)),
+                  //                       )
+                  //                     ],
+                  //                   ),
+                  //                 ],
+                  //               ))
+                  //         ],
+                  //       ),
+                  //       Divider(
+                  //         color: blue3,
+                  //       ),
+                  //       Container(
+                  //         child: Row(
+                  //             crossAxisAlignment: CrossAxisAlignment.center,
+                  //             children: [
+                  //               Container(
+                  //                 decoration: BoxDecoration(
+                  //                     borderRadius:
+                  //                         BorderRadius.circular(height * 0.05),
+                  //                     color: blue3.withOpacity(0.5)),
+                  //                 child: Row(
+                  //                     children: makeAttendeeCircles(
+                  //                         height, width, meeting['attendees'])),
+                  //               ),
+                  //               Spacer(),
+                  //               TextButton(
+                  //           child: Padding(
+                  //             padding: EdgeInsets.symmetric(
+                  //                 horizontal: width * 0.03),
+                  //             child: new Text(
+                  //               "Requests",
+                  //               style: TextStyle(fontSize: height * 0.02),
+                  //             ),
+                  //           ),
+                  //           onPressed: () {
+                  //             Navigator.push(
+                  //                 context,
+                  //                 MaterialPageRoute(
+                  //                     builder: (context) => EventRequestPage(meeting:meeting,
+                  //                         meetingID: meetingID)));
+                  //           },
+                  //           style: ButtonStyle(
+                  //             foregroundColor: MaterialStateProperty.all<Color>(
+                  //                 Colors.white),
+                  //             backgroundColor:
+                  //                 MaterialStateProperty.all<Color>(blue3),
+                  //             shape: MaterialStateProperty.all(
+                  //               RoundedRectangleBorder(
+                  //                 borderRadius: BorderRadius.circular(30.0),
+                  //               ),
+                  //             ),
+                  //           ),
+                  //         ),
+                  //         // SizedBox(width: width * 0.015),
+                  //         // TextButton(
+                  //         //         child: Padding(
+                  //         //           padding: EdgeInsets.symmetric(
+                  //         //               horizontal: width * 0.02),
+                  //         //           child: new Text(
+                  //         //             "Cancel",
+                  //         //             style: TextStyle(fontSize: height * 0.02),
+                  //         //           ),
+                  //         //         ),
+                  //         //         onPressed: null,
+                  //         //         style: ButtonStyle(
+                  //         //           foregroundColor:
+                  //         //               MaterialStateProperty.all<Color>(
+                  //         //                   Colors.white),
+                  //         //           backgroundColor:
+                  //         //               MaterialStateProperty.all<Color>(
+                  //         //                   Colors.red),
+                  //         //           shape: MaterialStateProperty.all(
+                  //         //             RoundedRectangleBorder(
+                  //         //               borderRadius:
+                  //         //                   BorderRadius.circular(30.0),
+                  //         //             ),
+                  //         //           ),
+                  //         //         ),
+                  //         //       )
+                  //             ]),
+                  //       ),
+                  //     ],
+                  //   ),
+                  // ))
                   );
           } else {
             return SizedBox(height: height * 0.1);
@@ -734,7 +1078,7 @@ class _SchedulePageState extends State<SchedulePage>
                   tabs: [Tab(text: 'Joined Events'), Tab(text: 'My Events')]),
               SizedBox(height: height * 0.01),
               SizedBox(
-                height: height * 0.7,
+                height: height * 0.6,
                 child: TabBarView(
                   controller: _controller,
                   children: [

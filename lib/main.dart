@@ -3,10 +3,17 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:timeshare/home.dart';
 
+import 'package:device_preview/device_preview.dart';
+
 import 'homepage.dart';
 
 void main() {
-  runApp(MyApp());
+  runApp(
+    DevicePreview(
+    enabled: true,
+    builder: (context) => MyApp(), // Wrap your app
+  ),
+    );
 }
 
 class MyApp extends StatefulWidget {
@@ -51,6 +58,8 @@ class _MyAppState extends State<MyApp> {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
+      locale: DevicePreview.locale(context),
+      builder: DevicePreview.appBuilder,
       title: 'Time Share',
       theme: ThemeData(
         primarySwatch: Colors.blue,

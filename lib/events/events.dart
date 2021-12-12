@@ -231,8 +231,7 @@ class _EventsListPageState extends State<EventsListPage> {
                                 Spacer(),
                                 TextButton(
                                   child: Padding(
-                                    padding: EdgeInsets.symmetric(
-                                        horizontal: width * 0.03),
+                                    padding: EdgeInsets.symmetric(vertical:6, horizontal: 16),
                                     child: new Text(
                                       "Join",
                                       style: TextStyle(
@@ -252,6 +251,9 @@ class _EventsListPageState extends State<EventsListPage> {
                                                 uid: uid)));
                                   },
                                   style: ButtonStyle(
+                                    minimumSize: MaterialStateProperty.all(Size.zero),
+                                    padding: MaterialStateProperty.all(EdgeInsets.zero,),
+                                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                                     foregroundColor:
                                         MaterialStateProperty.all<Color>(
                                             Colors.black),
@@ -269,7 +271,7 @@ class _EventsListPageState extends State<EventsListPage> {
                         ),
                       ],
                     ),
-                  )));
+                  ),),);
             } else {
               return SizedBox(height: height * 0.1);
             }

@@ -14,21 +14,21 @@ Color green = Color(0xFF00e600);
 Color yellow = Color(0xFFffd500);
 
 TextStyle kHeading1Style =
-    TextStyle(fontSize: height * 0.06, fontWeight: FontWeight.w500);
+    TextStyle(fontSize: 28, fontWeight: FontWeight.w500);
 TextStyle kHeading2Style =
-    TextStyle(fontSize: height * 0.035, fontWeight: FontWeight.w500);
+    TextStyle(fontSize: 25, fontWeight: FontWeight.w500);
 TextStyle kHeading3Style =
-    TextStyle(fontSize: height * 0.03, fontWeight: FontWeight.w500);
+    TextStyle(fontSize: 24, fontWeight: FontWeight.w500);
 TextStyle kHeading4Style =
-    TextStyle(fontSize: height * 0.02, fontWeight: FontWeight.w500);
+    TextStyle(fontSize: 16, fontWeight: FontWeight.w500);
 TextStyle kHeading5Style = TextStyle(
-    fontSize: height * 0.018, color: Colors.black, fontWeight: FontWeight.bold);
+    fontSize: 15, color: Colors.black, fontWeight: FontWeight.bold);
 TextStyle kHeading6Style = TextStyle(
-    fontSize: height * 0.016, color: Colors.black, fontWeight: FontWeight.bold);
+    fontSize: 14, color: Colors.black, fontWeight: FontWeight.bold);
 TextStyle kInputLabelStyle =
-    TextStyle(fontSize: height * 0.02, color: Colors.black);
+    TextStyle(fontSize: 16, color: Colors.black);
 TextStyle kButtonText = TextStyle(
-    fontSize: height * 0.02, letterSpacing: 1.5, fontWeight: FontWeight.bold);
+    fontSize: 18, letterSpacing: 1.5, fontWeight: FontWeight.bold);
 
 BoxDecoration linerGradient = BoxDecoration(
   borderRadius: BorderRadius.circular(height * 0.005),

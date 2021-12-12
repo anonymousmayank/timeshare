@@ -43,7 +43,8 @@ dependencies:
   liquid_pull_to_refresh: ^3.0.0
   cached_network_image: ^3.0.0
   animated_text_kit: ^4.2.1
-  provider: ^4.3.2+2
+  provider: ^5.0.0
+  device_preview: ^0.7.0
   
 dev_dependencies:
   flutter_test:
